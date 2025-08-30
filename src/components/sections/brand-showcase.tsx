@@ -1,0 +1,141 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
+
+const BrandShowcase = () => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-20%" });
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+  
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.4, 1, 0.4]);
+
+  const backgroundImageUrl = "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/d64gy-s7uro-18.webp?";
+  const gifUrl = "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/giftest-21.gif?";
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+        staggerChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  const titleVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  return (
+    <section
+      ref={ref}
+      className="relative w-full bg-cover bg-center overflow-hidden"
+      style={{ backgroundImage: `url(${backgroundImageUrl})` }}
+      aria-label="Brand Showcase"
+    >
+      <motion.div 
+        className="absolute inset-0 bg-black/40" 
+        style={{ y, opacity }}
+      />
+      <div className="container relative mx-auto h-full min-h-[400px] px-16 lg:min-h-[560px] lg:px-70">
+        <motion.div 
+          className="flex h-full flex-col items-center justify-center gap-12 py-16 text-center md:flex-row md:justify-between md:gap-0 md:py-0 md:text-left"
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+        >
+          <motion.div 
+            className="flex flex-col items-center md:items-start"
+            variants={itemVariants}
+          >
+            <motion.h3 
+              className="font-heading text-xl font-normal uppercase tracking-[0.2em] text-white md:text-2xl"
+              variants={titleVariants}
+            >
+              Wear Quality - Embrace Uniqueness
+            </motion.h3>
+            <motion.div 
+              className="mt-6 h-[35px] w-[140px]"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+              transition={{ delay: 0.6, duration: 0.6, ease: "easeOut" }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <Image
+                src={gifUrl}
+                alt="OFLYN brand values animation"
+                width={140}
+                height={35}
+                unoptimized
+                className="h-full w-full object-contain"
+              />
+            </motion.div>
+          </motion.div>
+
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Link
+              href="/en/pages/about"
+              className="group mt-4 flex items-center gap-x-2.5 rounded-lg border border-white/20 bg-black/10 px-4 py-2.5 text-sm text-white backdrop-blur-sm transition-all duration-300 hover:border-white/50 hover:bg-black/30 hover:shadow-lg md:mt-0"
+            >
+              <span className="relative block h-[18px] w-[18px] overflow-hidden">
+                <motion.span 
+                  className="absolute inset-0 transition-transform duration-300 ease-in-out group-hover:-translate-y-full"
+                  initial={{ rotate: 0 }}
+                  whileHover={{ rotate: 45 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ArrowUpRight className="h-full w-full" strokeWidth={1.5} />
+                </motion.span>
+                <motion.span 
+                  className="absolute inset-0 translate-y-full transition-transform duration-300 ease-in-out group-hover:translate-y-0"
+                  initial={{ rotate: 0 }}
+                  whileHover={{ rotate: 45 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ArrowUpRight className="h-full w-full" strokeWidth={1.5} />
+                </motion.span>
+              </span>
+              <span className="font-body text-base font-light capitalize">More about oflyn</span>
+            </Link>
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+export default BrandShowcase;
