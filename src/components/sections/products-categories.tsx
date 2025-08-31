@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { motion, Variants } from 'framer-motion';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 const categories = [
   {
@@ -31,10 +31,12 @@ interface CategoryCardProps {
   imgSrc: string;
   categoryName: string;
   index: number;
+  imageBlurVariants: any;
+  isInView: boolean;
 }
 
-const CategoryCard = ({ href, imgSrc, categoryName, index }: CategoryCardProps) => {
-  const cardVariants = {
+const CategoryCard = ({ href, imgSrc, categoryName, index, imageBlurVariants, isInView }: CategoryCardProps) => {
+  const cardVariants: Variants = {
     hidden: { opacity: 0, y: 60, scale: 0.9 },
     visible: {
       opacity: 1,
@@ -67,13 +69,20 @@ const CategoryCard = ({ href, imgSrc, categoryName, index }: CategoryCardProps) 
         transition={{ duration: 0.4, ease: "easeOut" }}
         className="col-start-1 row-start-1"
       >
-        <Image
-          src={imgSrc}
-          alt={categoryName}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
-          className="object-cover"
-        />
+        <motion.div
+          variants={imageBlurVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          className="w-full h-full overflow-hidden"
+        >
+          <Image
+            src={imgSrc}
+            alt={categoryName}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
+            className="object-cover"
+          />
+        </motion.div>
       </motion.div>
       <motion.div 
         className="col-start-1 row-start-1 bg-gradient-to-t from-black/60 via-black/30 to-transparent" 
@@ -94,33 +103,9 @@ const CategoryCard = ({ href, imgSrc, categoryName, index }: CategoryCardProps) 
 };
 
 const ProductsCategories = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-20%" });
+  const { ref, isInView, blurToAppearVariants, imageBlurVariants, staggerContainerVariants, childVariants } = useScrollAnimation({ margin: "-20%" });
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        staggerChildren: 0.2
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  const titleVariants = {
+  const titleVariants: Variants = {
     hidden: { opacity: 0, x: -50 },
     visible: {
       opacity: 1,
@@ -136,13 +121,13 @@ const ProductsCategories = () => {
     <motion.section 
       ref={ref}
       className="bg-black text-white py-16 lg:py-40 px-4 lg:px-[70px]"
-      variants={containerVariants}
+      variants={blurToAppearVariants}
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
     >
       <motion.div 
         className="h-px bg-border" 
-        variants={itemVariants}
+        variants={childVariants}
         initial={{ scaleX: 0 }}
         animate={isInView ? { scaleX: 1 } : { scaleX: 0 }}
         transition={{ duration: 1, ease: "easeOut" }}
@@ -151,7 +136,7 @@ const ProductsCategories = () => {
       <div className="mt-16 grid lg:grid-cols-2 lg:gap-x-20 gap-y-16">
         <motion.div 
           className="flex flex-col gap-12 justify-start lg:justify-center"
-          variants={itemVariants}
+          variants={childVariants}
         >
           <div className="flex flex-col gap-4">
             <motion.p 
@@ -194,7 +179,7 @@ const ProductsCategories = () => {
         </motion.div>
         <motion.div 
           className="grid grid-cols-1 sm:grid-cols-3 gap-5"
-          variants={itemVariants}
+          variants={childVariants}
         >
           {categories.map((category, index) => (
             <CategoryCard
@@ -203,6 +188,8 @@ const ProductsCategories = () => {
               imgSrc={category.image}
               categoryName={category.name}
               index={index}
+              imageBlurVariants={imageBlurVariants}
+              isInView={isInView}
             />
           ))}
         </motion.div>

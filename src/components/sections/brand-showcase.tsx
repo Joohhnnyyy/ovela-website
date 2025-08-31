@@ -3,14 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { useRef } from "react";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const BrandShowcase = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-20%" });
+  const parallaxRef = useRef(null);
+  const { ref, isInView, blurToAppearVariants, imageBlurVariants, staggerContainerVariants, childVariants } = useScrollAnimation({ margin: "-20%" });
   const { scrollYProgress } = useScroll({
-    target: ref,
+    target: parallaxRef,
     offset: ["start end", "end start"]
   });
   
@@ -20,47 +21,26 @@ const BrandShowcase = () => {
   const backgroundImageUrl = "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/d64gy-s7uro-18.webp?";
   const gifUrl = "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/giftest-21.gif?";
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.8,
-        staggerChildren: 0.2
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  const titleVariants = {
+  const titleVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.8,
-        ease: "easeOut"
+        duration: 0.8
       }
     }
   };
 
   return (
-    <section
-      ref={ref}
+    <motion.section
+      ref={parallaxRef}
       className="relative w-full bg-cover bg-center overflow-hidden"
       style={{ backgroundImage: `url(${backgroundImageUrl})` }}
       aria-label="Brand Showcase"
+      variants={blurToAppearVariants}
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
     >
       <motion.div 
         className="absolute inset-0 bg-black/40" 
@@ -68,14 +48,15 @@ const BrandShowcase = () => {
       />
       <div className="container relative mx-auto h-full min-h-[400px] px-16 lg:min-h-[560px] lg:px-70">
         <motion.div 
+          ref={ref}
           className="flex h-full flex-col items-center justify-center gap-12 py-16 text-center md:flex-row md:justify-between md:gap-0 md:py-0 md:text-left"
-          variants={containerVariants}
+          variants={staggerContainerVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
         >
           <motion.div 
             className="flex flex-col items-center md:items-start"
-            variants={itemVariants}
+            variants={childVariants}
           >
             <motion.h3 
               className="font-heading text-xl font-normal uppercase tracking-[0.2em] text-white md:text-2xl"
@@ -87,22 +68,29 @@ const BrandShowcase = () => {
               className="mt-6 h-[35px] w-[140px]"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-              transition={{ delay: 0.6, duration: 0.6, ease: "easeOut" }}
+              transition={{ delay: 0.6, duration: 0.6 }}
               whileHover={{ scale: 1.05 }}
             >
-              <Image
-                src={gifUrl}
-                alt="OFLYN brand values animation"
-                width={140}
-                height={35}
-                unoptimized
-                className="h-full w-full object-contain"
-              />
+              <motion.div
+                variants={imageBlurVariants}
+                initial="hidden"
+                animate={isInView ? "visible" : "hidden"}
+                className="w-full h-full overflow-hidden"
+              >
+                <Image
+                  src={gifUrl}
+                  alt="OVELA brand values animation"
+                  width={140}
+                  height={35}
+                  unoptimized
+                  className="h-full w-full object-contain"
+                />
+              </motion.div>
             </motion.div>
           </motion.div>
 
           <motion.div
-            variants={itemVariants}
+            variants={childVariants}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.2 }}
@@ -129,12 +117,12 @@ const BrandShowcase = () => {
                   <ArrowUpRight className="h-full w-full" strokeWidth={1.5} />
                 </motion.span>
               </span>
-              <span className="font-body text-base font-light capitalize">More about oflyn</span>
+              <span className="font-body text-base font-light capitalize">More about ovela</span>
             </Link>
           </motion.div>
         </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 

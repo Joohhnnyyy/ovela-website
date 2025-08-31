@@ -404,10 +404,9 @@ export default function HoverReceiver() {
   const [focusBox, setFocusBox] = useState<Box>(null);
   const [focusedElementId, setFocusedElementId] = useState<string | null>(null);
   const [isVisualEditMode, setIsVisualEditMode] = useState(() => {
-    // Initialize from localStorage if available
+    // Force disable visual edit mode to prevent navigation issues
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem(VISUAL_EDIT_MODE_KEY);
-      return stored === "true";
+      localStorage.removeItem(VISUAL_EDIT_MODE_KEY);
     }
     return false;
   });

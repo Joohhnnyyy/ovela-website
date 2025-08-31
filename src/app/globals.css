@@ -1,11 +1,87 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap');
 
+/* Custom Cursor Styles */
+* {
+  cursor: none !important;
+}
+
+/* Ensure mix-blend-mode works properly */
+body {
+  background-color: #000;
+}
+
+/* Interactive elements for cursor detection */
+.cursor-interactive {
+  position: relative;
+}
+
+/* Melodrama Font Definitions */
+@font-face {
+  font-family: 'Melodrama';
+  src: url('/fonts/Melodrama-Light.woff2') format('woff2'),
+       url('/fonts/Melodrama-Light.woff') format('woff'),
+       url('/fonts/Melodrama-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Melodrama';
+  src: url('/fonts/Melodrama-Regular.woff2') format('woff2'),
+       url('/fonts/Melodrama-Regular.woff') format('woff'),
+       url('/fonts/Melodrama-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Melodrama';
+  src: url('/fonts/Melodrama-Medium.woff2') format('woff2'),
+       url('/fonts/Melodrama-Medium.woff') format('woff'),
+       url('/fonts/Melodrama-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Melodrama';
+  src: url('/fonts/Melodrama-Semibold.woff2') format('woff2'),
+       url('/fonts/Melodrama-Semibold.woff') format('woff'),
+       url('/fonts/Melodrama-Semibold.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Melodrama';
+  src: url('/fonts/Melodrama-Bold.woff2') format('woff2'),
+       url('/fonts/Melodrama-Bold.woff') format('woff'),
+       url('/fonts/Melodrama-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Melodrama-Variable';
+  src: url('/fonts/Melodrama-Variable.woff2') format('woff2'),
+       url('/fonts/Melodrama-Variable.woff') format('woff'),
+       url('/fonts/Melodrama-Variable.ttf') format('truetype');
+  font-weight: 300 700;
+  font-display: swap;
+  font-style: normal;
+}
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @custom-variant dark (&:is(.dark *));
 
+/* Custom radial gradient utilities */
+.bg-gradient-radial {
+  background-image: radial-gradient(circle, var(--tw-gradient-stops));
+}
+
 @theme {
-  /* Shadcn/UI Colors - Modified for OFLYN Dark Theme */
+  /* Shadcn/UI Colors - Modified for OVELA Dark Theme */
   --color-background: #000000;
   --color-foreground: #ffffff;
 
@@ -75,18 +151,27 @@
     }
   }
 
-  /* OFLYN Specific Colors */
+  @keyframes gradient-move {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  /* OVELA Specific Colors */
   --color-black-secondary: #141414;
   --color-gray-dark: #333333;
   --color-gray-light: #666666;
   --color-off-white: #F5F5F5;
   --color-gray-medium: #999999;
 
-  /* OFLYN Typography */
-  --font-sans: "Inter", sans-serif;
-  --font-hero: var(--font-sans);
-  --font-heading: var(--font-sans);
-  --font-body: var(--font-sans);
+  /* OVELA Typography */
+  --font-sans: "Melodrama", "Inter", sans-serif;
+  --font-hero: "Melodrama", "Inter", sans-serif;
+  --font-heading: "Melodrama", "Inter", sans-serif;
+  --font-body: "Melodrama", "Inter", sans-serif;
 }
 
 /*
@@ -107,7 +192,7 @@
   }
 
   :root {
-    /* Shadcn/UI CSS Variables - Modified for OFLYN Dark Theme */
+    /* Shadcn/UI CSS Variables - Modified for OVELA Dark Theme */
     --background: var(--color-background);
     --foreground: var(--color-foreground);
     --card: var(--color-card);
@@ -143,7 +228,7 @@
     --sidebar-ring: var(--color-sidebar-ring);
   }
 
-  /* OFLYN Global Styles */
+  /* OVELA Global Styles */
   html {
     scroll-behavior: smooth;
   }

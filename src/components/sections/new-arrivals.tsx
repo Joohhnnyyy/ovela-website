@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ArrowRight } from 'lucide-react';
-import { motion, useInView } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 type ProductVariant = {
   colorHex: string;
@@ -99,7 +100,7 @@ const productsData: Product[] = [
   },
 ];
 
-function ProductCard({ product, index }: { product: Product; index: number }) {
+function ProductCard({ product, index, imageBlurVariants, isInView }: { product: Product; index: number; imageBlurVariants: any; isInView: boolean }) {
   const [activeVariantIndex, setActiveVariantIndex] = useState(0);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
@@ -113,7 +114,7 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
   const currentImages = activeVariant.images;
   const currentImage = currentImages[activeImageIndex] || currentImages[0];
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { opacity: 0, y: 60 },
     visible: {
       opacity: 1,
@@ -141,13 +142,20 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.3 }}
           >
-            <Image
-              src={currentImage}
-              alt={`${product.name} ${product.type}`}
-              width={580}
-              height={725}
-              className="w-full h-full object-cover aspect-[580/725] transition-transform duration-300 group-hover:scale-105"
-            />
+            <motion.div
+              variants={imageBlurVariants}
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
+              className="w-full h-full overflow-hidden"
+            >
+              <Image
+                src={currentImage}
+                alt={`${product.name} ${product.type}`}
+                width={580}
+                height={725}
+                className="w-full h-full object-cover aspect-[580/725] transition-transform duration-300 group-hover:scale-105"
+              />
+            </motion.div>
           </motion.div>
         </Link>
         {product.isNew && (
@@ -253,48 +261,24 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
 }
 
 export default function NewArrivals() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-10%" });
-
-  const sectionVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut"
-      }
-    }
-  };
+  const { ref, isInView, blurToAppearVariants, imageBlurVariants, staggerContainerVariants, childVariants } = useScrollAnimation({ margin: "-20%" });
 
   return (
     <motion.section 
       ref={ref}
       className="grid gap-y-8 px-4 pb-32 lg:px-[70px] lg:pb-40"
-      variants={sectionVariants}
+      variants={blurToAppearVariants}
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
     >
       <motion.div 
         className="border-t border-white/15"
-        variants={itemVariants}
+        variants={childVariants}
       />
       <div className="mt-8 grid gap-y-10">
         <motion.div 
           className="flex flex-col items-start gap-y-10 lg:flex-row lg:items-center lg:justify-between"
-          variants={itemVariants}
+          variants={childVariants}
         >
           <h2 className="text-xl uppercase text-white">New arrivals</h2>
           <div className="hidden lg:flex">
@@ -324,12 +308,12 @@ export default function NewArrivals() {
         </motion.div>
         <div className="grid grid-cols-1 gap-x-5 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
           {productsData.map((product, index) => (
-            <ProductCard key={product.id} product={product} index={index} />
+            <ProductCard key={product.id} product={product} index={index} imageBlurVariants={imageBlurVariants} isInView={isInView} />
           ))}
         </div>
         <motion.div 
           className="flex lg:hidden pt-4"
-          variants={itemVariants}
+          variants={childVariants}
         >
            <Link href="/en/collections/all" passHref>
               <motion.div

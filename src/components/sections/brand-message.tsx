@@ -1,8 +1,8 @@
 "use client";
 
 import React from 'react';
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { motion, Variants } from 'framer-motion';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 const FranceIcon = ({ className }: { className?: string }) => (
     <span className={`inline-block align-middle mx-1 h-[0.8em] w-[1.1em] -translate-y-[0.06em] ${className || ''}`}>
@@ -29,23 +29,11 @@ const FranceIcon = ({ className }: { className?: string }) => (
 );
 
 const BrandMessage = () => {
-    const ref = useRef(null);
-    const isInView = useInView(ref, { once: true, margin: "-20%" });
+    const { ref, isInView, blurToAppearVariants, staggerContainerVariants, childVariants } = useScrollAnimation({ margin: "-20%" });
     
     const fullText = "Exclusive, sustainable fashion, designed and customized in France for those who value quality and authenticity over mass production.";
 
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                duration: 0.6,
-                staggerChildren: 0.1
-            }
-        }
-    };
-
-    const textVariants = {
+    const textVariants: Variants = {
         hidden: { opacity: 0, y: 30 },
         visible: {
             opacity: 1,
@@ -57,6 +45,41 @@ const BrandMessage = () => {
         }
     };
 
+    const wordRevealVariants: Variants = {
+        hidden: { opacity: 0, y: 20, filter: "blur(4px)" },
+        visible: {
+            opacity: 1,
+            y: 0,
+            filter: "blur(0px)",
+            transition: {
+                duration: 0.6,
+                ease: "easeOut"
+            }
+        }
+    };
+
+    const containerVariants: Variants = {
+        hidden: {},
+        visible: {
+            transition: {
+                staggerChildren: 0.08,
+                delayChildren: 0.2
+            }
+        }
+    };
+
+    const splitTextIntoWords = (text: string) => {
+        return text.split(' ').map((word, index) => (
+            <motion.span
+                key={index}
+                variants={wordRevealVariants}
+                className="inline-block mr-[0.25em]"
+            >
+                {word}
+            </motion.span>
+        ));
+    };
+
     return (
         <section
             ref={ref}
@@ -65,7 +88,7 @@ const BrandMessage = () => {
         >
             <motion.div 
                 className="grid w-fit justify-self-center text-center"
-                variants={containerVariants}
+                variants={staggerContainerVariants}
                 initial="hidden"
                 animate={isInView ? "visible" : "hidden"}
             >
@@ -73,45 +96,49 @@ const BrandMessage = () => {
                 {/* Desktop Version */}
                 <motion.p 
                     className="hidden font-sans text-[38px] leading-[1.2] -tracking-[0.01em] text-white lg:inline-block max-w-[894px]"
-                    variants={textVariants}
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate={isInView ? "visible" : "hidden"}
                 >
-                    Exclusive, sustainable fashion, designed and
+                    {splitTextIntoWords("Exclusive, sustainable fashion, designed and")}
                     <br />
-                    customized in
+                    {splitTextIntoWords("customized in")}
                     <motion.span
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-                        transition={{ delay: 0.8, duration: 0.5 }}
+                        transition={{ delay: 1.2, duration: 0.5 }}
                     >
                         <FranceIcon />
                     </motion.span>
-                    France for those who value quality
+                    {splitTextIntoWords("France for those who value quality")}
                     <br />
-                    and authenticity over mass production.
+                    {splitTextIntoWords("and authenticity over mass production.")}
                 </motion.p>
                 
                 {/* Mobile Version */}
                 <motion.p 
                     className="inline-block px-4 font-sans text-[24px] leading-[1.25] -tracking-[0.01em] text-white lg:hidden"
-                    variants={textVariants}
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate={isInView ? "visible" : "hidden"}
                 >
-                    Exclusive, sustainable fashion,
+                    {splitTextIntoWords("Exclusive, sustainable fashion,")}
                     <br />
-                    designed and customized
+                    {splitTextIntoWords("designed and customized")}
                     <br />
-                    in
+                    {splitTextIntoWords("in")}
                     <motion.span
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-                        transition={{ delay: 0.8, duration: 0.5 }}
+                        transition={{ delay: 1.2, duration: 0.5 }}
                     >
                         <FranceIcon />
                     </motion.span>
-                    France for those who value
+                    {splitTextIntoWords("France for those who value")}
                     <br />
-                    quality and authenticity over
+                    {splitTextIntoWords("quality and authenticity over")}
                     <br />
-                    mass production.
+                    {splitTextIntoWords("mass production.")}
                 </motion.p>
 
                 {/* Screen Reader Only Version */}

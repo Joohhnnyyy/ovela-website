@@ -3,8 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from "@/lib/utils";
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { motion, Variants } from 'framer-motion';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 interface Product {
   id: number;
@@ -59,33 +59,9 @@ const products: Product[] = [
 ];
 
 const ProductCarousel = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-20%" });
+  const { ref, isInView, blurToAppearVariants, imageBlurVariants, staggerContainerVariants, childVariants } = useScrollAnimation({ margin: "-20%" });
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  const productVariants = {
+  const productVariants: Variants = {
     hidden: { opacity: 0, x: 50 },
     visible: {
       opacity: 1,
@@ -101,14 +77,14 @@ const ProductCarousel = () => {
     <motion.section 
       ref={ref}
       className="bg-black py-24"
-      variants={containerVariants}
+      variants={blurToAppearVariants}
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
     >
       <div className="px-4 lg:px-[70px]">
         <motion.div 
           className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide"
-          variants={itemVariants}
+          variants={childVariants}
         >
           {products.map((product, index) => (
             <motion.div 
@@ -121,7 +97,7 @@ const ProductCarousel = () => {
               viewport={{ once: true, margin: "-10%" }}
               transition={{ delay: index * 0.1 }}
             >
-              <Link href={product.href} className="group grid gap-y-6">
+              <Link href={product.href} className="group grid gap-y-6 cursor-interactive">
                 <motion.div 
                   className="aspect-[4/5] overflow-hidden rounded-md bg-off-white"
                   whileHover={{ 
@@ -134,13 +110,20 @@ const ProductCarousel = () => {
                     whileHover={{ scale: 1.05 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <Image
-                      src={product.imageSrc}
-                      alt={product.imageAlt}
-                      width={260}
-                      height={325}
-                      className="h-full w-full object-cover object-center transition-transform duration-300 ease-in-out"
-                    />
+                    <motion.div
+                      variants={imageBlurVariants}
+                      initial="hidden"
+                      animate={isInView ? "visible" : "hidden"}
+                      className="w-full h-full overflow-hidden"
+                    >
+                      <Image
+                        src={product.imageSrc}
+                        alt={product.imageAlt}
+                        width={260}
+                        height={325}
+                        className="h-full w-full object-cover object-center transition-transform duration-300 ease-in-out"
+                      />
+                    </motion.div>
                   </motion.div>
                 </motion.div>
                 <motion.div 

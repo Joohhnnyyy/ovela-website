@@ -26,7 +26,7 @@ const BrandStatement = () => {
             className="group flex w-full sm:w-auto justify-center items-center whitespace-nowrap gap-x-2 rounded-lg border border-border bg-transparent px-4 py-3 text-sm text-muted-foreground/70 transition-colors hover:bg-secondary hover:text-secondary-foreground"
           >
             <ChevronRight className="h-[18px] w-[18px]" />
-            <span>More about oflyn</span>
+            <span>More about ovela</span>
           </Link>
         </div>
       </div>

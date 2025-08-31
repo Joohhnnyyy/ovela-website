@@ -4,8 +4,11 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Play, Pause, Volume2, VolumeX, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { useRouter } from "next/navigation";
 
 const HeroVideo = () => {
+  const router = useRouter();
   const [isPlayerOpen, setPlayerOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -13,7 +16,8 @@ const HeroVideo = () => {
   const [duration, setDuration] = useState("0:00");
 
   const playerVideoRef = useRef<HTMLVideoElement>(null);
-  const videoSrc = "https://cdn.shopify.com/videos/c/o/v/ca375a1da1f54edbabad68bbb8e91fc7.mp4";
+  const videoSrc = "/videos/hero-video.mp4";
+  const { ref, isInView, blurToAppearVariants } = useScrollAnimation();
 
   const formatTime = (time: number) => {
     if (isNaN(time)) return "0:00";
@@ -88,10 +92,26 @@ const HeroVideo = () => {
     }
   }, [isPlayerOpen, handlePlayerClose]);
 
+  // Cleanup effect to ensure body overflow is restored
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   return (
     <>
-      <section className="relative grid w-full bg-black min-h-[100svh] lg:h-screen lg:max-h-screen overflow-hidden">
-        <div className="absolute inset-0">
+      <motion.section 
+        ref={ref}
+        className="relative flex items-center justify-center w-full bg-black min-h-[100svh] lg:h-screen lg:max-h-screen overflow-hidden px-4 lg:px-16"
+        variants={blurToAppearVariants}
+        initial="hidden"
+        animate={isInView ? "visible" : "hidden"}
+      >
+        <div 
+          className="relative w-full max-w-6xl aspect-[16/9] lg:aspect-[21/9] cursor-pointer group transition-transform duration-300 hover:scale-[1.02]"
+          onClick={handlePlayerOpen}
+        >
           <video
             key={videoSrc}
             src={videoSrc}
@@ -101,11 +121,9 @@ const HeroVideo = () => {
             playsInline
             className="w-full h-full object-cover"
           />
-        </div>
-        
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/70" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/70 group-hover:from-black/60 group-hover:via-black/20 group-hover:to-black/60 transition-all duration-300" />
 
-        <div className="relative z-10 col-span-full row-span-full grid place-items-center">
+          <div className="absolute inset-0 z-10 flex items-center justify-center">
           <motion.button
             onClick={handlePlayerOpen}
             aria-label="Watch the video"
@@ -121,29 +139,58 @@ const HeroVideo = () => {
               Watch video
             </span>
           </motion.button>
-        </div>
+          </div>
 
-        <div className="absolute z-10 inset-0 flex items-center justify-between px-16 lg:px-70 pointer-events-none">
-          <motion.div 
-            className="flex w-full justify-between lg:w-1/4"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-          >
-            <p className="font-body text-[20px] uppercase text-white">0FLYN</p>
-            <p className="font-body text-[20px] uppercase text-white">memory</p>
-          </motion.div>
-          <motion.div 
-            className="hidden w-1/4 justify-between lg:flex"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-          >
-            <p className="font-body text-[20px] uppercase text-white">collection</p>
-            <p className="font-body text-[20px] uppercase text-white">2025</p>
-          </motion.div>
+          <div className="absolute z-10 inset-0 flex items-center justify-between px-8 lg:px-16">
+            <motion.div 
+              className="flex w-full justify-between lg:w-1/4"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+            >
+              <motion.button 
+                className="font-body text-[20px] uppercase text-white hover:text-white/70 transition-all duration-300 cursor-pointer"
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => router.push('/')}
+              >
+                OVELA
+              </motion.button>
+              <motion.button 
+                className="font-body text-[20px] uppercase text-white hover:text-white/70 transition-all duration-300 cursor-pointer"
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => router.push('/pages/about')}
+              >
+                memory
+              </motion.button>
+            </motion.div>
+            <motion.div 
+              className="hidden w-1/4 justify-between lg:flex"
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+            >
+              <motion.button 
+                className="font-body text-[20px] uppercase text-white hover:text-white/70 transition-all duration-300 cursor-pointer"
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => router.push('/collections/all')}
+              >
+                collection
+              </motion.button>
+              <motion.button 
+                className="font-body text-[20px] uppercase text-white hover:text-white/70 transition-all duration-300 cursor-pointer"
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => router.push('/pages/lookbook')}
+              >
+                2025
+              </motion.button>
+            </motion.div>
+          </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Video Player Modal */}
       <AnimatePresence>
