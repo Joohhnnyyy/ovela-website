@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { useState, useEffect, useRef } from 'react';
 
 const products = [
   {
@@ -63,6 +64,29 @@ const categories = ["ALL PRODUCTS", "HOODIES", "JACKETS", "SETS"];
 
 export default function ShopPage() {
   const { ref, isInView, imageBlurVariants } = useScrollAnimation({ margin: "-20%" });
+  const [ovelaInView, setOvelaInView] = useState(false);
+  const ovelaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setOvelaInView(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    if (ovelaRef.current) {
+      observer.observe(ovelaRef.current);
+    }
+
+    return () => {
+      if (ovelaRef.current) {
+        observer.unobserve(ovelaRef.current);
+      }
+    };
+  }, []);
   
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
@@ -400,9 +424,44 @@ export default function ShopPage() {
         </motion.div>
       </section>
 
+      {/* OVELA Footer Section */}
       <div className="relative z-10">
-        <Footer />
-        <FinalBrandingSection />
+        <div
+          ref={ovelaRef}
+          className="w-full h-[60vh] lg:h-[70vh] xl:h-[80vh] flex items-center justify-center bg-black text-white relative z-10"
+        >
+          <motion.h1
+            className="text-[35vw] lg:text-[32vw] xl:text-[28vw] tracking-wider lg:tracking-[0.1em] leading-none"
+            style={{ fontWeight: 50 }}
+          >
+            {"OVELA".split("").map((letter, index) => (
+              <motion.span
+                key={index}
+                initial={{
+                  opacity: 0,
+                  filter: "blur(20px)",
+                  y: 100,
+                }}
+                animate={ovelaInView ? {
+                  opacity: 1,
+                  filter: "blur(0px)",
+                  y: 0,
+                } : {
+                  opacity: 0,
+                  filter: "blur(20px)",
+                  y: 100,
+                }}
+                transition={{
+                  duration: 1.2,
+                  delay: index * 0.2,
+                  ease: "easeOut",
+                }}
+              >
+                {letter}
+              </motion.span>
+            ))}
+          </motion.h1>
+        </div>
       </div>
     </div>
   );

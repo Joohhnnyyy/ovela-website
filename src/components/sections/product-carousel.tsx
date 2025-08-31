@@ -83,7 +83,7 @@ const ProductCarousel = () => {
     >
       <div className="px-4 lg:px-[70px]">
         <motion.div 
-          className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide"
+          className="flex gap-6 overflow-x-auto pb-4 scroll-smooth scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/20 hover:scrollbar-thumb-white/40"
           variants={childVariants}
         >
           {products.map((product, index) => (

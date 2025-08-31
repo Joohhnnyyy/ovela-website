@@ -1,9 +1,9 @@
 "use client";
 
+import { useState, useEffect, useRef } from 'react';
 import Navigation from '@/components/sections/navigation';
 import Footer from '@/components/sections/footer';
-import FinalBrandingSection from '@/components/sections/final-branding';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
@@ -12,42 +12,42 @@ const lookbookImages = [
     id: 1,
     title: "Memory Collection",
     season: "Spring 2024",
-    image: "/api/placeholder/600/800",
+    image: "https://picsum.photos/600/800",
     orientation: "portrait"
   },
   {
     id: 2,
     title: "Urban Essentials",
     season: "Spring 2024",
-    image: "/api/placeholder/800/600",
+    image: "https://picsum.photos/800/600",
     orientation: "landscape"
   },
   {
     id: 3,
     title: "Minimal Luxury",
     season: "Spring 2024",
-    image: "/api/placeholder/600/800",
+    image: "https://picsum.photos/600/800?random=3",
     orientation: "portrait"
   },
   {
     id: 4,
     title: "Street Culture",
     season: "Spring 2024",
-    image: "/api/placeholder/800/600",
+    image: "https://picsum.photos/800/600?random=4",
     orientation: "landscape"
   },
   {
     id: 5,
     title: "Conscious Fashion",
     season: "Spring 2024",
-    image: "/api/placeholder/600/800",
+    image: "https://picsum.photos/600/800?random=5",
     orientation: "portrait"
   },
   {
     id: 6,
     title: "Future Forward",
     season: "Spring 2024",
-    image: "/api/placeholder/800/600",
+    image: "https://picsum.photos/800/600?random=6",
     orientation: "landscape"
   }
 ];
@@ -56,9 +56,36 @@ const seasons = ["All", "Spring 2024", "Winter 2023", "Fall 2023", "Summer 2023"
 
 export default function LookbookPage() {
   const { ref, isInView, imageBlurVariants } = useScrollAnimation({ margin: "-20%" });
+  const containerRef = useRef(null);
+  
+  // Scroll setup for OVELA section
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+  
+  // Footer scrolls faster (more transform)
+  const footerY = useTransform(scrollYProgress, [0, 1], [0, -200]);
+  // OVELA div scrolls slower (less transform)
+  const ovelaY = useTransform(scrollYProgress, [0, 1], [0, -50]);
+  
+  // Scroll animation for OVELA reveal effect
+  const ovelaRef = useRef(null);
+  const [ovelaInView, setOvelaInView] = useState(false);
+  
+  useEffect(() => {
+    const unsubscribe = scrollYProgress.onChange((latest) => {
+      // Trigger animation when scroll progress is near the end (90% or more)
+      if (latest >= 0.9 && !ovelaInView) {
+        setOvelaInView(true);
+      }
+    });
+    
+    return unsubscribe;
+  }, [scrollYProgress, ovelaInView]);
   
   return (
-    <div className="min-h-screen bg-black">
+    <div ref={containerRef} className="min-h-screen bg-black">
       <Navigation />
       
       {/* Hero Section */}
@@ -115,7 +142,7 @@ export default function LookbookPage() {
           className="relative h-[60vh] lg:h-[80vh] overflow-hidden bg-secondary"
         >
           <Image
-            src="/api/placeholder/1200/800"
+            src="https://picsum.photos/1200/800"
             alt="Featured Collection"
             fill
             className="object-cover"
@@ -232,8 +259,45 @@ export default function LookbookPage() {
         </motion.div>
       </section>
 
-      <Footer />
-      <FinalBrandingSection />
+      {/* Footer with faster scroll */}
+      <motion.div style={{ y: footerY }}>
+        <Footer />
+      </motion.div>
+      
+      {/* OVELA Section with slower scroll and reveal effect */}
+      <motion.div 
+        ref={ovelaRef}
+        className="w-full h-[60vh] lg:h-[70vh] xl:h-[80vh] flex items-center justify-center bg-black text-white relative z-10"
+        style={{ y: ovelaY }}
+      >
+        <motion.h1
+          className="text-[35vw] lg:text-[32vw] xl:text-[28vw] tracking-wider lg:tracking-[0.1em] leading-none"
+          style={{ fontWeight: 50 }}
+        >
+          {"OVELA".split("").map((letter, index) => (
+            <motion.span
+              key={index}
+              initial={{
+                opacity: 0,
+                y: 100,
+                filter: "blur(20px)",
+              }}
+              animate={{
+                opacity: ovelaInView ? 1 : 0,
+                y: ovelaInView ? 0 : 100,
+                filter: ovelaInView ? "blur(0px)" : "blur(20px)",
+              }}
+              transition={{
+                  duration: 1.2,
+                  ease: "easeOut",
+                  delay: index * 0.2,
+                }}
+            >
+              {letter}
+            </motion.span>
+          ))}
+        </motion.h1>
+      </motion.div>
     </div>
   );
 }

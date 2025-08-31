@@ -56,8 +56,8 @@ const FinalBrandingSection = () => {
       ref={parallaxRef}
       className="bg-black text-white relative"
       variants={blurToAppearVariants}
-      initial="hidden"
-      animate={isInView && shouldReveal ? "visible" : "hidden"}
+      initial="visible"
+      animate="visible"
     >
       <div className="relative h-[574px] overflow-hidden">
         {/* Background gradient glow with parallax effect */}
@@ -77,14 +77,16 @@ const FinalBrandingSection = () => {
         {/* Large "OVELA" branding text */}
         <motion.div 
           ref={ref}
-          className="absolute bottom-0 z-10 w-max left-1/2 -translate-x-1/2 lg:left-[310px] lg:-translate-x-0"
+          className="absolute top-1/2 -translate-y-1/2 z-10 w-max left-1/2 -translate-x-1/2 lg:left-[310px] lg:-translate-x-0"
           variants={brandTextVariants}
+          initial="visible"
+          animate="visible"
         >
           <motion.h1
-            className="bg-gradient-to-t from-gray-300 via-gray-600 to-gray-800 bg-clip-text font-heading text-transparent"
+            className="bg-gradient-to-t from-white via-gray-200 to-gray-400 bg-clip-text font-heading text-transparent text-center"
             style={{
               fontFamily: "'Neue', var(--font-heading)",
-              fontSize: 'clamp(200px, 30vw, 400px)',
+              fontSize: 'clamp(300px, 40vw, 600px)',
               lineHeight: 0.7,
               fontWeight: 400,
             }}

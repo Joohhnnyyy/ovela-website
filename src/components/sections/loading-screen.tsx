@@ -137,10 +137,10 @@ const LoadingScreen = ({ onComplete }: LoadingScreenProps) => {
               className={`font-sans text-3xl font-normal tracking-[0.1em] transition-colors duration-1000 relative z-10 ${
                 stage >= 2 ? "text-white" : "text-black"
               }`}
-              initial={{ scale: 2.5 }}
+              initial={{ scale: 4 }}
               animate={{
                 ...( stage >= 1 ? getHeaderPosition() : { x: 0, y: 0 }),
-                scale: stage >= 1 ? 1 : 2.5
+                scale: stage >= 1 ? 1 : 4
               }}
               transition={{ 
                 duration: 1.2, 

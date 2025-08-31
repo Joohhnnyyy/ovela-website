@@ -42,20 +42,17 @@ const BrandShowcase = () => {
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
     >
-      <motion.div 
-        className="absolute inset-0 bg-black/40" 
-        style={{ y, opacity }}
-      />
+
       <div className="container relative mx-auto h-full min-h-[400px] px-16 lg:min-h-[560px] lg:px-70">
         <motion.div 
           ref={ref}
-          className="flex h-full flex-col items-center justify-center gap-12 py-16 text-center md:flex-row md:justify-between md:gap-0 md:py-0 md:text-left"
+          className="flex h-full items-center justify-center py-8"
           variants={staggerContainerVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
         >
           <motion.div 
-            className="flex flex-col items-center md:items-start"
+            className="flex w-full justify-between items-center"
             variants={childVariants}
           >
             <motion.h3 
@@ -64,8 +61,9 @@ const BrandShowcase = () => {
             >
               Wear Quality - Embrace Uniqueness
             </motion.h3>
+            
             <motion.div 
-              className="mt-6 h-[35px] w-[140px]"
+              className="h-[35px] w-[140px]"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
               transition={{ delay: 0.6, duration: 0.6 }}
@@ -87,38 +85,38 @@ const BrandShowcase = () => {
                 />
               </motion.div>
             </motion.div>
-          </motion.div>
 
-          <motion.div
-            variants={childVariants}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Link
-              href="/en/pages/about"
-              className="group mt-4 flex items-center gap-x-2.5 rounded-lg border border-white/20 bg-black/10 px-4 py-2.5 text-sm text-white backdrop-blur-sm transition-all duration-300 hover:border-white/50 hover:bg-black/30 hover:shadow-lg md:mt-0"
+            <motion.div
+              variants={childVariants}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.2 }}
             >
-              <span className="relative block h-[18px] w-[18px] overflow-hidden">
-                <motion.span 
-                  className="absolute inset-0 transition-transform duration-300 ease-in-out group-hover:-translate-y-full"
-                  initial={{ rotate: 0 }}
-                  whileHover={{ rotate: 45 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <ArrowUpRight className="h-full w-full" strokeWidth={1.5} />
-                </motion.span>
-                <motion.span 
-                  className="absolute inset-0 translate-y-full transition-transform duration-300 ease-in-out group-hover:translate-y-0"
-                  initial={{ rotate: 0 }}
-                  whileHover={{ rotate: 45 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <ArrowUpRight className="h-full w-full" strokeWidth={1.5} />
-                </motion.span>
-              </span>
-              <span className="font-body text-base font-light capitalize">More about ovela</span>
-            </Link>
+              <Link
+                href="/en/pages/about"
+                className="group flex items-center gap-x-2.5 rounded-lg border border-white/20 bg-black/10 px-4 py-2.5 text-sm text-white backdrop-blur-sm transition-all duration-300 hover:border-white/50 hover:bg-black/30 hover:shadow-lg"
+              >
+                <span className="relative block h-[18px] w-[18px] overflow-hidden">
+                  <motion.span 
+                    className="absolute inset-0 transition-transform duration-300 ease-in-out group-hover:-translate-y-full"
+                    initial={{ rotate: 0 }}
+                    whileHover={{ rotate: 45 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ArrowUpRight className="h-full w-full" strokeWidth={1.5} />
+                  </motion.span>
+                  <motion.span 
+                    className="absolute inset-0 translate-y-full transition-transform duration-300 ease-in-out group-hover:translate-y-0"
+                    initial={{ rotate: 0 }}
+                    whileHover={{ rotate: 45 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ArrowUpRight className="h-full w-full" strokeWidth={1.5} />
+                  </motion.span>
+                </span>
+                <span className="font-body text-base font-light capitalize">More about ovela</span>
+              </Link>
+            </motion.div>
           </motion.div>
         </motion.div>
       </div>
