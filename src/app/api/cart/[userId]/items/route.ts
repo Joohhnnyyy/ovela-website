@@ -4,10 +4,10 @@ import { CartService } from '@/services/cartService';
 // PUT /api/cart/[userId]/items - Update cart item quantity
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const { userId } = params;
+    const { userId } = await params;
     const { productId, size, color, quantity } = await request.json();
     
     // Validate required fields
@@ -40,10 +40,10 @@ export async function PUT(
 // DELETE /api/cart/[userId]/items - Remove item from cart
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const { userId } = params;
+    const { userId } = await params;
     const { searchParams } = new URL(request.url);
     
     const productId = searchParams.get('productId');

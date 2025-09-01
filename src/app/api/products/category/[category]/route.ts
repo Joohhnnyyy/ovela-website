@@ -4,10 +4,10 @@ import { ProductService } from '@/services/productService';
 // GET /api/products/category/[category] - Get products by category
 export async function GET(
   request: NextRequest,
-  { params }: { params: { category: string } }
+  { params }: { params: Promise<{ category: string }> }
 ) {
   try {
-    const { category } = params;
+    const { category } = await params;
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '20');
     

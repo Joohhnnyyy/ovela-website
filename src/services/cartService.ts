@@ -17,21 +17,66 @@ import {
 import { db } from '@/lib/firebase';
 import { Cart, CartData, CartItem, CartItemData, Product, ApiResponse } from '@/types/database';
 import { ProductService } from './productService';
+import { handleFirestoreError, retryOperation } from '@/lib/firestore-utils';
+import { getProductById } from '@/data/products';
+
+// Local storage key for offline cart data
+const LOCAL_CART_KEY = 'ovela_cart_';
+
+// Helper functions for local storage
+class LocalCartStorage {
+  static getCart(userId: string): Cart | null {
+    if (typeof window === 'undefined') return null;
+    try {
+      const stored = localStorage.getItem(LOCAL_CART_KEY + userId);
+      if (!stored) return null;
+      const parsed = JSON.parse(stored);
+      // Convert date strings back to Date objects
+      return {
+        ...parsed,
+        createdAt: new Date(parsed.createdAt),
+        updatedAt: new Date(parsed.updatedAt)
+      };
+    } catch (error) {
+      console.warn('Failed to parse local cart data:', error);
+      return null;
+    }
+  }
+
+  static setCart(userId: string, cart: Cart): void {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(LOCAL_CART_KEY + userId, JSON.stringify(cart));
+    } catch (error) {
+      console.warn('Failed to save cart to local storage:', error);
+    }
+  }
+
+  static removeCart(userId: string): void {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.removeItem(LOCAL_CART_KEY + userId);
+    } catch (error) {
+      console.warn('Failed to remove cart from local storage:', error);
+    }
+  }
+}
 
 const CARTS_COLLECTION = 'carts';
 
 export class CartService {
   /**
-   * Get user's cart
+   * Get user's cart (offline-first approach)
    */
   static async getUserCart(userId: string): Promise<ApiResponse<Cart>> {
     try {
-      const cartRef = doc(db, CARTS_COLLECTION, userId);
-      const cartSnap = await getDoc(cartRef);
-
-      if (!cartSnap.exists()) {
+      // Get cart from local storage only (offline-first)
+      let cart = LocalCartStorage.getCart(userId);
+      
+      if (!cart) {
         // Create empty cart if it doesn't exist
-        const newCart: CartData = {
+        const newCart: Cart = {
+          id: userId,
           userId,
           items: [],
           totalPrice: 0,
@@ -39,26 +84,11 @@ export class CartService {
           createdAt: new Date(),
           updatedAt: new Date()
         };
-
-        await setDoc(cartRef, {
-          ...newCart,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        });
-
-        return {
-          success: true,
-          data: { id: userId, ...newCart }
-        };
+        
+        // Save to local storage
+        LocalCartStorage.setCart(userId, newCart);
+        cart = newCart;
       }
-
-      const cartData = cartSnap.data() as CartData;
-      const cart: Cart = {
-        id: cartSnap.id,
-        ...cartData,
-        createdAt: cartData.createdAt instanceof Timestamp ? cartData.createdAt.toDate() : cartData.createdAt,
-        updatedAt: cartData.updatedAt instanceof Timestamp ? cartData.updatedAt.toDate() : cartData.updatedAt
-      };
 
       return {
         success: true,
@@ -68,13 +98,13 @@ export class CartService {
       console.error('Error getting user cart:', error);
       return {
         success: false,
-        error: 'Failed to fetch cart'
+        error: 'Failed to get cart from local storage'
       };
     }
   }
 
   /**
-   * Add item to cart
+   * Add item to cart (offline-first approach)
    */
   static async addToCart(
     userId: string, 
@@ -84,109 +114,123 @@ export class CartService {
     quantity: number = 1
   ): Promise<ApiResponse<Cart>> {
     try {
-      // First, verify the product exists and has sufficient inventory
-      const productResult = await ProductService.getProductById(productId);
-      if (!productResult.success || !productResult.data) {
+      // Get current cart from local storage
+      const cartResult = await this.getUserCart(userId);
+      if (!cartResult.success || !cartResult.data) {
         return {
           success: false,
-          error: 'Product not found'
+          error: 'Failed to get cart'
         };
       }
 
-      const product = productResult.data;
+      const cart = cartResult.data;
       
-      // Check inventory
-      const inventoryItem = product.inventory?.find(item => item.size === size && item.color === color);
-      if (!inventoryItem || inventoryItem.quantity < quantity) {
-        return {
-          success: false,
-          error: 'Insufficient inventory'
-        };
+      // For offline mode, we'll use a simplified product object
+      // Determine category based on product ID
+      let category = 'sneakers';
+      if (productId.includes('bag') || productId.includes('backpack') || productId.includes('briefcase') || productId.includes('messenger') || productId.includes('pouch') || productId.includes('hobo')) {
+        category = 'bags';
+      } else if (productId.includes('coat') || productId.includes('pants') || productId.includes('sweater') || productId.includes('sweatshirt') || productId.includes('tshirt') || productId.includes('jacket') || productId.includes('blouson') || productId.includes('shirt')) {
+        category = 'clothing';
+      } else if (productId.includes('bracelet') || productId.includes('cap') || productId.includes('sunglasses') || productId.includes('necklace') || productId.includes('bangle') || productId.includes('brooch') || productId.includes('ring') || productId.includes('tie')) {
+        category = 'accessories';
       }
 
-      const cartRef = doc(db, CARTS_COLLECTION, userId);
-      const cartSnap = await getDoc(cartRef);
-
-      let cartData: CartData;
-      
-      if (!cartSnap.exists()) {
-        // Create new cart
-        cartData = {
-          userId,
-          items: [],
-          totalPrice: 0,
-          totalItems: 0,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
-      } else {
-        cartData = cartSnap.data() as CartData;
+      // Determine the correct file extension based on known products
+      let imageExtension = '.jpg';
+      if (productId === 'b30-countdown-black-mesh' || productId.includes('b80-lounge') || productId.includes('cd-icon')) {
+        imageExtension = '.webp';
       }
+
+      // Create a simplified product object for offline mode
+      // Get actual product price from product data
+      const getProductPrice = (productId: string): number => {
+        const actualProduct = getProductById(productId);
+        if (actualProduct) {
+          return actualProduct.price;
+        }
+        
+        // Fallback to base prices in INR if product not found
+        const basePrices = {
+          sneakers: 8999,
+          bags: 4999,
+          clothing: 2999,
+          accessories: 1999
+        };
+        
+        return basePrices[category as keyof typeof basePrices] || 8999;
+      };
+
+      const simpleProduct: Product = {
+        id: productId,
+        name: productId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        description: 'Premium product with modern design',
+        price: getProductPrice(productId),
+        category,
+        brand: 'Ovela',
+        images: [`/products/${category}/${productId}-1${imageExtension}`],
+        sizes: [
+          { size: 'S', label: 'Small', available: true },
+          { size: 'M', label: 'Medium', available: true },
+          { size: 'L', label: 'Large', available: true }
+        ],
+        colors: [
+          { color: 'black', name: 'Black', hexCode: '#000000', available: true },
+          { color: 'white', name: 'White', hexCode: '#FFFFFF', available: true }
+        ],
+        inventory: [],
+        tags: [],
+        isActive: true,
+        isFeatured: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
 
       // Check if item already exists in cart
-      const existingItemIndex = cartData.items.findIndex(
+      const existingItemIndex = cart.items.findIndex(
         item => item.productId === productId && item.size === size && item.color === color
       );
 
       if (existingItemIndex >= 0) {
         // Update existing item quantity
-        const newQuantity = cartData.items[existingItemIndex].quantity + quantity;
-        
-        // Check if new quantity exceeds inventory
-        if (newQuantity > inventoryItem.quantity) {
-          return {
-            success: false,
-            error: 'Cannot add more items than available in inventory'
-          };
-        }
-
-        cartData.items[existingItemIndex].quantity = newQuantity;
-        // Update item price if needed
-        cartData.items[existingItemIndex].price = product.price;
+        cart.items[existingItemIndex].quantity += quantity;
+        cart.items[existingItemIndex].updatedAt = new Date();
       } else {
         // Add new item to cart
         const newCartItem: CartItem = {
           id: `${productId}-${size}-${color}`,
           userId,
           productId,
-          product,
+          product: simpleProduct,
           size,
           color,
           quantity,
-          price: product.price,
+          price: simpleProduct.price,
           addedAt: new Date(),
           updatedAt: new Date()
         };
         
-        cartData.items.push(newCartItem);
+        cart.items.push(newCartItem);
       }
 
       // Recalculate totals
-      cartData.totalItems = cartData.items.reduce((total, item) => total + item.quantity, 0);
-      cartData.totalPrice = cartData.items.reduce((total, item) => total + (item.quantity * item.price), 0);
-      cartData.updatedAt = new Date();
+      cart.totalItems = cart.items.reduce((total, item) => total + item.quantity, 0);
+      cart.totalPrice = cart.items.reduce((total, item) => total + (item.quantity * item.price), 0);
+      cart.updatedAt = new Date();
 
-      // Save to Firestore
-      await setDoc(cartRef, {
-        ...cartData,
-        updatedAt: serverTimestamp()
-      });
-
-      const updatedCart: Cart = {
-        id: userId,
-        ...cartData
-      };
+      // Save to local storage
+      LocalCartStorage.setCart(userId, cart);
 
       return {
         success: true,
-        data: updatedCart,
+        data: cart,
         message: 'Item added to cart successfully'
       };
     } catch (error) {
       console.error('Error adding to cart:', error);
       return {
         success: false,
-        error: 'Failed to add item to cart'
+        error: handleFirestoreError(error)
       };
     }
   }
@@ -349,13 +393,12 @@ export class CartService {
   }
 
   /**
-   * Clear entire cart
+   * Clear cart (offline-first approach)
    */
   static async clearCart(userId: string): Promise<ApiResponse<Cart>> {
     try {
-      const cartRef = doc(db, CARTS_COLLECTION, userId);
-      
-      const emptyCartData: CartData = {
+      const emptyCart: Cart = {
+        id: userId,
         userId,
         items: [],
         totalPrice: 0,
@@ -364,19 +407,12 @@ export class CartService {
         updatedAt: new Date()
       };
 
-      await setDoc(cartRef, {
-        ...emptyCartData,
-        updatedAt: serverTimestamp()
-      });
-
-      const clearedCart: Cart = {
-        id: userId,
-        ...emptyCartData
-      };
+      // Save to local storage
+      LocalCartStorage.setCart(userId, emptyCart);
 
       return {
         success: true,
-        data: clearedCart,
+        data: emptyCart,
         message: 'Cart cleared successfully'
       };
     } catch (error) {
@@ -384,6 +420,70 @@ export class CartService {
       return {
         success: false,
         error: 'Failed to clear cart'
+      };
+    }
+  }
+
+  /**
+   * Update cart prices to match current product prices
+   */
+  static async updateCartPrices(userId: string): Promise<ApiResponse<Cart>> {
+    try {
+      const cartResult = await this.getUserCart(userId);
+      
+      if (!cartResult.success || !cartResult.data) {
+        return {
+          success: false,
+          error: 'Cart not found'
+        };
+      }
+
+      const cart = cartResult.data;
+      let hasUpdates = false;
+
+      // Update prices for each item
+      const updatedItems = cart.items.map(item => {
+        const actualProduct = getProductById(item.productId);
+        if (actualProduct && actualProduct.price !== item.price) {
+          hasUpdates = true;
+          return {
+            ...item,
+            price: actualProduct.price
+          };
+        }
+        return item;
+      });
+
+      if (hasUpdates) {
+        const totals = this.calculateCartTotals(updatedItems);
+        const updatedCart: Cart = {
+          ...cart,
+          items: updatedItems,
+          totalPrice: totals.totalPrice,
+          totalItems: totals.totalItems,
+          updatedAt: new Date()
+        };
+
+        // Save updated cart
+        LocalCartStorage.setCart(userId, updatedCart);
+
+        return {
+          success: true,
+          data: updatedCart,
+          message: 'Cart prices updated successfully'
+        };
+      }
+
+      return {
+        success: true,
+        data: cart,
+        message: 'No price updates needed'
+      };
+    } catch (error) {
+      console.error('Error updating cart prices:', error);
+      return {
+        success: false,
+        error: 'Failed to update cart prices'
       };
     }
   }

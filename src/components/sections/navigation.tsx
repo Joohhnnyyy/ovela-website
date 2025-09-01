@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Menu, ShoppingBag, X, ChevronDown, User, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 
 const navLinkClasses = "flex items-center text-white uppercase text-sm font-normal tracking-wider hover:opacity-70 transition-opacity cursor-interactive";
 
@@ -13,6 +14,8 @@ const navLinkClasses = "flex items-center text-white uppercase text-sm font-norm
 export default function Navigation() {
   const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
   const { currentUser, logout } = useAuth();
+  const cart = useCart();
+  const cartItems = cart?.items || [];
 
   const handleLogout = async () => {
     try {
@@ -177,16 +180,27 @@ export default function Navigation() {
             variants={itemVariants}
           >
             <div className="flex items-center gap-x-4">
-              {/* Mobile Menu */}
-              <motion.button 
-                aria-label="Open bag" 
-                className={`${navLinkClasses} p-2 lg:hidden`}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ShoppingBag size={24} />
-              </motion.button>
+              {/* Mobile Cart */}
+              <Link href="/cart" className="lg:hidden">
+                <motion.button 
+                  aria-label={`Open cart with ${cartItems?.length || 0} items`}
+                  className={`${navLinkClasses} p-2 relative`}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ShoppingBag size={24} />
+                  {cartItems?.length > 0 && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1 -right-1 bg-white text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium"
+                    >
+                      {cartItems?.length || 0}
+                    </motion.span>
+                  )}
+                </motion.button>
+              </Link>
               
               {/* Desktop Auth Links */}
               <div className="hidden lg:flex items-center gap-x-6">
@@ -218,21 +232,23 @@ export default function Navigation() {
                   </motion.div>
                 )}
                 
-                <motion.button 
-                  aria-label="Open bag with 0 items" 
-                  className={`${navLinkClasses} flex items-center gap-x-1.5`}
-                  whileHover={{ x: 3 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <span>Bag</span>
-                  <span>/</span>
-                  <motion.span
-                    whileHover={{ scale: 1.2 }}
+                <Link href="/cart">
+                  <motion.button 
+                    aria-label={`Open cart with ${cartItems?.length || 0} items`}
+                    className={`${navLinkClasses} flex items-center gap-x-1.5`}
+                    whileHover={{ x: 3 }}
                     transition={{ duration: 0.2 }}
                   >
-                    0
-                  </motion.span>
-                </motion.button>
+                    <span>Cart</span>
+                    <span>/</span>
+                    <motion.span
+                      whileHover={{ scale: 1.2 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {cartItems?.length || 0}
+                    </motion.span>
+                  </motion.button>
+                </Link>
               </div>
             </div>
           </motion.div>

@@ -5,10 +5,10 @@ import { PurchaseStatus } from '@/types/database';
 // GET /api/purchases/[id] - Get purchase by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     const result = await PurchaseService.getPurchaseById(id);
     
@@ -32,10 +32,10 @@ export async function GET(
 // PUT /api/purchases/[id] - Update purchase status
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const { status, trackingNumber } = await request.json();
     
     // Validate required fields
@@ -72,10 +72,10 @@ export async function PUT(
 // DELETE /api/purchases/[id] - Cancel purchase
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const { searchParams } = new URL(request.url);
     const reason = searchParams.get('reason');
     

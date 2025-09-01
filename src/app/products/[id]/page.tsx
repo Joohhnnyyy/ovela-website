@@ -7,11 +7,13 @@ import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { getProductById, getRelatedProducts, products } from '@/data/products';
+import { useCart } from '@/contexts/CartContext';
 
 export default function ProductDetailPage() {
   const params = useParams();
   const productId = params.id as string;
   const product = getProductById(productId);
+  const { addToCart } = useCart();
   
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState(0);
@@ -20,6 +22,7 @@ export default function ProductDetailPage() {
   const [isZoomed, setIsZoomed] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Scroll setup for OVELA section
   const containerRef = useRef(null);
@@ -46,6 +49,45 @@ export default function ProductDetailPage() {
     
     return unsubscribe;
   }, [scrollYProgress, ovelaInView]);
+
+  const handleAddToCart = async () => {
+    if (!product) return;
+    
+    setIsAddingToCart(true);
+    try {
+      const selectedColorName = product.colors[selectedColor] || product.colors[0] || 'Default';
+      const selectedSizeName = product.sizes[selectedSize] || product.sizes[0] || 'Default';
+      
+      // Convert product to database Product format
+      const dbProduct = {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        category: product.category,
+        brand: 'Ovela', // Default brand
+        images: product.images,
+        sizes: product.sizes.map(size => ({ size, label: size, available: true })),
+        colors: product.colors.map(color => ({ color: color.toLowerCase(), name: color, hexCode: '#000000', available: true })),
+        inventory: [],
+        tags: [],
+        isActive: true,
+        isFeatured: product.featured || false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      await addToCart(dbProduct, quantity, selectedSizeName, selectedColorName);
+      
+      // Optional: Show success feedback
+      console.log('Product added to cart successfully!');
+    } catch (error) {
+      console.error('Failed to add product to cart:', error);
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
 
   if (!product) {
     return (
@@ -229,11 +271,13 @@ export default function ProductDetailPage() {
                      Buy now
                    </motion.button>
                    <motion.button 
-                     className="w-full border-2 border-white text-white py-4 md:py-3 px-6 rounded-xl md:rounded font-medium hover:bg-white hover:text-black transition-colors text-base md:text-lg touch-manipulation"
-                     whileHover={{ scale: 1.02 }}
-                     whileTap={{ scale: 0.98 }}
+                     className="w-full border-2 border-white text-white py-4 md:py-3 px-6 rounded-xl md:rounded font-medium hover:bg-white hover:text-black transition-colors text-base md:text-lg touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed"
+                     whileHover={{ scale: isAddingToCart ? 1 : 1.02 }}
+                     whileTap={{ scale: isAddingToCart ? 1 : 0.98 }}
+                     onClick={handleAddToCart}
+                     disabled={isAddingToCart}
                    >
-                     Add to bag ({quantity})
+                     {isAddingToCart ? 'Adding...' : `Add to bag (${quantity})`}
                    </motion.button>
                  </div>
 

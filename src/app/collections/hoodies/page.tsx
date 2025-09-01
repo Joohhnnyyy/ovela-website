@@ -12,7 +12,7 @@ const hoodieProducts = [
   {
     id: 1,
     name: "Black Hoodie Set",
-    price: "$189",
+    price: "₹15,699",
     image: "/LOOK_H_25_4_LOOK_070_E01.webp",
     category: "Hoodies",
     label: "New"
@@ -20,7 +20,7 @@ const hoodieProducts = [
   {
     id: 2,
     name: "Black Hoodie Set",
-    price: "$189",
+    price: "₹15,699",
     image: "/LOOK_H_25_4_LOOK_070_E02.webp",
     category: "Hoodies",
     label: "Hoodie"
@@ -28,7 +28,7 @@ const hoodieProducts = [
   {
     id: 3,
     name: "Black Hoodie Set",
-    price: "$189",
+    price: "₹15,699",
     image: "/LOOK_H_25_4_LOOK_070_E03.webp",
     category: "Hoodies",
     label: "Hoodie"
@@ -36,7 +36,7 @@ const hoodieProducts = [
   {
     id: 4,
     name: "Black Hoodie Set",
-    price: "$189",
+    price: "₹15,699",
     image: "/LOOK_H_25_4_LOOK_070_E04.webp",
     category: "Hoodies",
     label: "Hoodie"
@@ -44,7 +44,7 @@ const hoodieProducts = [
   {
     id: 7,
     name: "Premium Hoodie",
-    price: "$229",
+    price: "₹19,099",
     image: "/LOOK_H_25_4_LOOK_070_E01.webp",
     category: "Hoodies",
     label: "Premium"
@@ -52,7 +52,7 @@ const hoodieProducts = [
   {
     id: 10,
     name: "Oversized Hoodie",
-    price: "$209",
+    price: "₹17,399",
     image: "/LOOK_H_25_4_LOOK_070_E02.webp",
     category: "Hoodies",
     label: "Oversized"
@@ -60,7 +60,7 @@ const hoodieProducts = [
   {
     id: 13,
     name: "Zip Hoodie",
-    price: "$199",
+    price: "₹16,599",
     image: "/LOOK_H_25_4_LOOK_070_E03.webp",
     category: "Hoodies",
     label: "Zip"
@@ -105,9 +105,9 @@ export default function HoodiesPage() {
       case "alphabetically":
         return a.name.localeCompare(b.name);
       case "price-low":
-        return parseInt(a.price.replace('$', '')) - parseInt(b.price.replace('$', ''));
+        return parseInt(a.price.replace('₹', '').replace(',', '')) - parseInt(b.price.replace('₹', '').replace(',', ''));
       case "price-high":
-        return parseInt(b.price.replace('$', '')) - parseInt(a.price.replace('$', ''));
+        return parseInt(b.price.replace('₹', '').replace(',', '')) - parseInt(a.price.replace('₹', '').replace(',', ''));
       case "date":
         return b.id - a.id;
       default:

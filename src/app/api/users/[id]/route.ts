@@ -5,10 +5,10 @@ import { UserData, Address } from '@/types/database';
 // GET /api/users/[id] - Get user by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     const result = await UserService.getUserById(id);
     
@@ -32,10 +32,10 @@ export async function GET(
 // PUT /api/users/[id] - Update user
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const updates: Partial<UserData> = await request.json();
     
     const result = await UserService.updateUser(id, updates);
@@ -60,10 +60,10 @@ export async function PUT(
 // DELETE /api/users/[id] - Delete user
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     const result = await UserService.deleteUser(id);
     

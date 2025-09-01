@@ -5,10 +5,10 @@ import { ProductData } from '@/types/database';
 // GET /api/products/[id] - Get product by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     const result = await ProductService.getProductById(id);
     
@@ -32,10 +32,10 @@ export async function GET(
 // PUT /api/products/[id] - Update product
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const updates: Partial<ProductData> = await request.json();
     
     const result = await ProductService.updateProduct(id, updates);
@@ -60,10 +60,10 @@ export async function PUT(
 // DELETE /api/products/[id] - Delete product
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     const result = await ProductService.deleteProduct(id);
     

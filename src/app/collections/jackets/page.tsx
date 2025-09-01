@@ -12,7 +12,7 @@ const jacketProducts = [
   {
     id: 5,
     name: "Black Jacket Set",
-    price: "$189",
+    price: "₹15,699",
     image: "/LOOK_H_25_4_LOOK_070_E05.webp",
     category: "Jackets",
     label: "New"
@@ -20,7 +20,7 @@ const jacketProducts = [
   {
     id: 6,
     name: "Black Jacket Set",
-    price: "$189",
+    price: "₹15,699",
     image: "/LOOK_H_25_4_LOOK_070_E06.webp",
     category: "Jackets",
     label: "Jacket"
@@ -28,7 +28,7 @@ const jacketProducts = [
   {
     id: 8,
     name: "Leather Jacket",
-    price: "$349",
+    price: "₹29,099",
     image: "/LOOK_H_25_4_LOOK_070_E05.webp",
     category: "Jackets",
     label: "Premium"
@@ -36,7 +36,7 @@ const jacketProducts = [
   {
     id: 11,
     name: "Bomber Jacket",
-    price: "$279",
+    price: "₹23,199",
     image: "/LOOK_H_25_4_LOOK_070_E06.webp",
     category: "Jackets",
     label: "Bomber"
@@ -44,7 +44,7 @@ const jacketProducts = [
   {
     id: 14,
     name: "Denim Jacket",
-    price: "$159",
+    price: "₹13,199",
     image: "/LOOK_H_25_4_LOOK_070_E05.webp",
     category: "Jackets",
     label: "Denim"
@@ -77,9 +77,9 @@ export default function JacketsPage() {
       case "alphabetically":
         return a.name.localeCompare(b.name);
       case "price-low":
-        return parseInt(a.price.replace('$', '')) - parseInt(b.price.replace('$', ''));
+        return parseInt(a.price.replace('₹', '').replace(',', '')) - parseInt(b.price.replace('₹', '').replace(',', ''));
       case "price-high":
-        return parseInt(b.price.replace('$', '')) - parseInt(a.price.replace('$', ''));
+        return parseInt(b.price.replace('₹', '').replace(',', '')) - parseInt(a.price.replace('₹', '').replace(',', ''));
       case "date":
         return b.id - a.id;
       default:

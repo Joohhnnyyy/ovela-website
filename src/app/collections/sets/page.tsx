@@ -12,7 +12,7 @@ const setProducts = [
   {
     id: 9,
     name: "Tracksuit Set",
-    price: "$299",
+    price: "₹24,899",
     image: "/LOOK_H_25_4_LOOK_070_E01.webp",
     category: "Sets",
     label: "Set"
@@ -20,7 +20,7 @@ const setProducts = [
   {
     id: 12,
     name: "Casual Set",
-    price: "$249",
+    price: "₹20,699",
     image: "/LOOK_H_25_4_LOOK_070_E02.webp",
     category: "Sets",
     label: "Casual"
@@ -28,7 +28,7 @@ const setProducts = [
   {
     id: 15,
     name: "Sport Set",
-    price: "$329",
+    price: "₹27,399",
     image: "/LOOK_H_25_4_LOOK_070_E03.webp",
     category: "Sets",
     label: "Sport"
@@ -61,9 +61,9 @@ export default function SetsPage() {
       case "alphabetically":
         return a.name.localeCompare(b.name);
       case "price-low":
-        return parseInt(a.price.replace('$', '')) - parseInt(b.price.replace('$', ''));
+        return parseInt(a.price.replace('₹', '').replace(',', '')) - parseInt(b.price.replace('₹', '').replace(',', ''));
       case "price-high":
-        return parseInt(b.price.replace('$', '')) - parseInt(a.price.replace('$', ''));
+        return parseInt(b.price.replace('₹', '').replace(',', '')) - parseInt(a.price.replace('₹', '').replace(',', ''));
       case "date":
         return b.id - a.id;
       default:

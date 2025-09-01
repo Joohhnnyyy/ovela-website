@@ -4,10 +4,10 @@ import { CartService } from '@/services/cartService';
 // GET /api/cart/[userId] - Get user's cart
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const { userId } = params;
+    const { userId } = await params;
     
     const result = await CartService.getUserCart(userId);
     
@@ -31,10 +31,10 @@ export async function GET(
 // POST /api/cart/[userId] - Add item to cart
 export async function POST(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const { userId } = params;
+    const { userId } = await params;
     const { productId, quantity, size, color } = await request.json();
     
     // Validate required fields
@@ -67,10 +67,10 @@ export async function POST(
 // DELETE /api/cart/[userId] - Clear cart
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const { userId } = params;
+    const { userId } = await params;
     
     const result = await CartService.clearCart(userId);
     

@@ -60,6 +60,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
       setLoading(false);
+    }, (error) => {
+      console.error('Auth state change error:', error);
+      // Still set loading to false even if there's an error
+      setLoading(false);
     });
 
     return unsubscribe;
