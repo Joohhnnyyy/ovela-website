@@ -5,140 +5,30 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import Navigation from '@/components/sections/navigation';
 import Footer from '@/components/sections/footer';
+import { products, getProductsByCategory } from '@/data/products';
 
-const products = [
-  {
-    id: 1,
-    name: "Black Hoodie Set",
-    price: "$189",
-    image: "/LOOK_H_25_4_LOOK_070_E01.webp",
-    category: "Hoodies",
-    label: "New"
-  },
-  {
-    id: 2,
-    name: "Black Hoodie Set",
-    price: "$189",
-    image: "/LOOK_H_25_4_LOOK_070_E02.webp",
-    category: "Hoodies",
-    label: "Hoodie"
-  },
-  {
-    id: 3,
-    name: "Black Hoodie Set",
-    price: "$189",
-    image: "/LOOK_H_25_4_LOOK_070_E03.webp",
-    category: "Hoodies",
-    label: "Hoodie"
-  },
-  {
-    id: 4,
-    name: "Black Hoodie Set",
-    price: "$189",
-    image: "/LOOK_H_25_4_LOOK_070_E04.webp",
-    category: "Hoodies",
-    label: "Hoodie"
-  },
-  {
-    id: 5,
-    name: "Black Jacket",
-    price: "$249",
-    image: "/493C424D6500C980_E01.jpeg",
-    category: "Jackets",
-    label: "Jacket"
-  },
-  {
-    id: 6,
-    name: "Black Outfit",
-    price: "$199",
-    image: "/541V01A1699X8830_E01.jpeg",
-    category: "Sets",
-    label: "Set"
-  },
-  {
-    id: 7,
-    name: "Premium Hoodie",
-    price: "$229",
-    image: "/LOOK_H_25_4_LOOK_070_E01.webp",
-    category: "Hoodies",
-    label: "Premium"
-  },
-  {
-    id: 8,
-    name: "Urban Jacket",
-    price: "$299",
-    image: "/493C424D6500C980_E01.jpeg",
-    category: "Jackets",
-    label: "Urban"
-  },
-  {
-    id: 9,
-    name: "Complete Set",
-    price: "$349",
-    image: "/541V01A1699X8830_E01.jpeg",
-    category: "Sets",
-    label: "Complete"
-  },
-  {
-    id: 10,
-    name: "Oversized Hoodie",
-    price: "$209",
-    image: "/LOOK_H_25_4_LOOK_070_E02.webp",
-    category: "Hoodies",
-    label: "Oversized"
-  },
-  {
-    id: 11,
-    name: "Bomber Jacket",
-    price: "$279",
-    image: "/493C424D6500C980_E01.jpeg",
-    category: "Jackets",
-    label: "Bomber"
-  },
-  {
-    id: 12,
-    name: "Casual Set",
-    price: "$259",
-    image: "/541V01A1699X8830_E01.jpeg",
-    category: "Sets",
-    label: "Casual"
-  },
-  {
-    id: 13,
-    name: "Zip Hoodie",
-    price: "$199",
-    image: "/LOOK_H_25_4_LOOK_070_E03.webp",
-    category: "Hoodies",
-    label: "Zip"
-  },
-  {
-    id: 14,
-    name: "Denim Jacket",
-    price: "$319",
-    image: "/493C424D6500C980_E01.jpeg",
-    category: "Jackets",
-    label: "Denim"
-  },
-  {
-    id: 15,
-    name: "Sport Set",
-    price: "$289",
-    image: "/541V01A1699X8830_E01.jpeg",
-    category: "Sets",
-    label: "Sport"
-  }
-];
 
-const categories = ["ALL PRODUCTS", "HOODIES", "JACKETS", "SETS"];
+
+const categories = ["ALL PRODUCTS", "SNEAKERS", "CLOTHING", "ACCESSORIES", "BAGS"];
 
 export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState("ALL PRODUCTS");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
+  const getCategoryKey = (category: string) => {
+    const categoryMap: { [key: string]: "sneakers" | "clothing" | "accessories" | "bags" } = {
+      "SNEAKERS": "sneakers",
+      "CLOTHING": "clothing", 
+      "ACCESSORIES": "accessories",
+      "BAGS": "bags"
+    };
+    return categoryMap[category];
+  };
+
   const filteredProducts = selectedCategory === "ALL PRODUCTS" 
     ? products 
-    : products.filter(product => product.category.toUpperCase() === selectedCategory);
+    : getProductsByCategory(getCategoryKey(selectedCategory));
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -151,13 +41,7 @@ export default function ShopPage() {
     offset: ["start start", "end end"]
   });
   
-  // Footer scrolls faster (more transform)
-  const footerY = useTransform(scrollYProgress, [0, 1], [0, -200]);
-  // OVELA div scrolls slower (less transform)
-  const ovelaY = useTransform(scrollYProgress, [0, 1], [0, -50]);
-  
   // Scroll animation for OVELA reveal effect
-  const ovelaRef = useRef(null);
   const [ovelaInView, setOvelaInView] = useState(false);
   
   useEffect(() => {
@@ -190,7 +74,7 @@ export default function ShopPage() {
             playsInline
             className="w-full h-full object-cover"
           >
-            <source src="/hero-video.mp4" type="video/mp4" />
+            <source src="/videos/hero-video.mp4" type="video/mp4" />
           </video>
         </div>
         
@@ -239,7 +123,11 @@ export default function ShopPage() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="pl-8 pr-4 lg:pl-[100px] lg:pr-[70px]"
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-fr">
+          <div 
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-fr"
+            role="grid"
+            aria-label="Products collection"
+          >
             {currentProducts.map((product, index) => {
               // Different layout patterns for each page
               let isLargeCard = false;
@@ -258,7 +146,7 @@ export default function ShopPage() {
               }
 
               return (
-                <motion.div
+                <motion.article
                   key={product.id}
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -266,8 +154,13 @@ export default function ShopPage() {
                   className={`group ${
                     isLargeCard ? 'md:col-span-2 md:row-span-2' : ''
                   }`}
+                  role="gridcell"
                 >
-                  <Link href={`/products/${product.id}`} className="block h-full cursor-pointer">
+                  <Link 
+                    href={`/products/${product.id}`} 
+                    className="block h-full focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black rounded-xl transition-all duration-200"
+                    aria-label={`View ${product.name} for ₹${product.price.toLocaleString('en-IN')}`}
+                  >
                     <div className="relative overflow-hidden bg-gray-100 rounded-xl h-full flex flex-col shadow-md hover:shadow-xl transition-all duration-300">
                       <motion.div
                         whileHover={{ scale: 1.05 }}
@@ -275,13 +168,16 @@ export default function ShopPage() {
                         className="relative flex-1 min-h-[300px]"
                       >
                         <img
-                          src={product.image}
-                          alt={product.name}
+                          src={product.images[0]}
+                          alt={`${product.name} product image`}
                           className="w-full h-full object-cover"
                         />
                         <div className="absolute top-4 left-4">
-                          <span className="bg-black text-white px-3 py-1 text-xs uppercase tracking-wider">
-                            {product.label}
+                          <span 
+                            className="bg-black text-white px-3 py-1 text-xs uppercase tracking-wider"
+                            aria-label={`Category: ${product.category}`}
+                          >
+                            {product.category}
                           </span>
                         </div>
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
@@ -292,15 +188,25 @@ export default function ShopPage() {
                           {product.name}
                         </h3>
                         <div className="flex justify-between items-center">
-                          <span className="text-xl font-light">{product.price}</span>
-                          <button className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors">
-                            <span className="text-lg leading-none">+</span>
+                          <span className="text-xl font-light" aria-label={`Price: ${product.price} rupees`}>
+                            ₹{product.price.toLocaleString('en-IN')}
+                          </span>
+                          <button 
+                            className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400"
+                            aria-label={`Add ${product.name} to cart`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              // Add to cart functionality would go here
+                            }}
+                          >
+                            <span className="text-lg leading-none" aria-hidden="true">+</span>
                           </button>
                         </div>
                       </div>
                     </div>
                   </Link>
-                </motion.div>
+                </motion.article>
               );
             })}
           </div>
@@ -332,16 +238,12 @@ export default function ShopPage() {
         )}
       </section>
 
-      {/* Footer with faster scroll */}
-      <motion.div style={{ y: footerY }}>
-        <Footer />
-      </motion.div>
+      {/* Footer */}
+      <Footer />
       
-      {/* OVELA Section with slower scroll and reveal effect */}
+      {/* OVELA Section with reveal effect */}
       <motion.div 
-         ref={ovelaRef}
-         className="h-auto py-2 flex items-center justify-center bg-black relative z-10"
-         style={{ y: ovelaY }}
+         className="h-auto py-16 flex items-center justify-center bg-black relative"
        >
         <motion.h1
            className="text-[30vw] lg:text-[28vw] xl:text-[25vw] font-light tracking-wider text-white/80 select-none"

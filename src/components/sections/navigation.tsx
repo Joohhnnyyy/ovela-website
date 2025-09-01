@@ -154,7 +154,7 @@ export default function Navigation() {
               transition={{ duration: 0.2 }}
             >
               <Link href="/" aria-label="Ovela Home" className="cursor-interactive">
-                <span className="font-sans text-3xl font-normal tracking-[0.1em] text-white">
+                <span className="font-sans text-4xl font-normal tracking-[0.1em] text-white">
                   OVELA
                 </span>
               </Link>

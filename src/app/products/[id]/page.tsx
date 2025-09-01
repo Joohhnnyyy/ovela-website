@@ -6,284 +6,12 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-
-const products = [
-  {
-    id: 1,
-    name: "Black Hoodie Set",
-    price: "$189",
-    images: [
-      "/LOOK_H_25_4_LOOK_070_E01.webp",
-      "/LOOK_H_25_4_LOOK_070_E02.webp",
-      "/LOOK_H_25_4_LOOK_070_E03.webp",
-      "/LOOK_H_25_4_LOOK_070_E04.webp"
-    ],
-    category: "Hoodies",
-    colors: ["Black", "Gray"],
-    sizes: ["S", "M", "L", "XL"],
-    description: "Premium hoodie set with matching accessories",
-    details: "100% cotton fleece with adjustable hood",
-    care: "Machine wash cold, tumble dry low",
-    shipping: "Free shipping on orders over 50€"
-  },
-  {
-    id: 2,
-    name: "Black Hoodie Set",
-    price: "$189",
-    images: [
-      "/LOOK_H_25_4_LOOK_070_E02.webp",
-      "/LOOK_H_25_4_LOOK_070_E01.webp",
-      "/LOOK_H_25_4_LOOK_070_E03.webp",
-      "/LOOK_H_25_4_LOOK_070_E04.webp"
-    ],
-    category: "Hoodies",
-    colors: ["Black", "White"],
-    sizes: ["S", "M", "L", "XL"],
-    description: "Premium hoodie set with matching accessories",
-    details: "100% cotton fleece with adjustable hood",
-    care: "Machine wash cold, tumble dry low",
-    shipping: "Free shipping on orders over 50€"
-  },
-  {
-    id: 3,
-    name: "Black Hoodie Set",
-    price: "$189",
-    images: [
-      "/LOOK_H_25_4_LOOK_070_E03.webp",
-      "/LOOK_H_25_4_LOOK_070_E01.webp",
-      "/LOOK_H_25_4_LOOK_070_E02.webp",
-      "/LOOK_H_25_4_LOOK_070_E04.webp"
-    ],
-    category: "Hoodies",
-    colors: ["Black", "Gray"],
-    sizes: ["S", "M", "L", "XL"],
-    description: "Premium hoodie set with matching accessories",
-    details: "100% cotton fleece with adjustable hood",
-    care: "Machine wash cold, tumble dry low",
-    shipping: "Free shipping on orders over 50€"
-  },
-  {
-    id: 4,
-    name: "Black Hoodie Set",
-    price: "$189",
-    images: [
-      "/LOOK_H_25_4_LOOK_070_E04.webp",
-      "/LOOK_H_25_4_LOOK_070_E01.webp",
-      "/LOOK_H_25_4_LOOK_070_E02.webp",
-      "/LOOK_H_25_4_LOOK_070_E03.webp"
-    ],
-    category: "Hoodies",
-    colors: ["Black", "White"],
-    sizes: ["S", "M", "L", "XL"],
-    description: "Premium hoodie set with matching accessories",
-    details: "100% cotton fleece with adjustable hood",
-    care: "Machine wash cold, tumble dry low",
-    shipping: "Free shipping on orders over 50€"
-  },
-  {
-    id: 5,
-    name: "Black Jacket",
-    price: "$249",
-    images: [
-      "/493C424D6500C980_E01.jpeg",
-      "/LOOK_H_25_4_LOOK_070_E01.webp",
-      "/LOOK_H_25_4_LOOK_070_E02.webp",
-      "/LOOK_H_25_4_LOOK_070_E03.webp"
-    ],
-    category: "Jackets",
-    colors: ["Black", "Navy"],
-    sizes: ["S", "M", "L", "XL"],
-    description: "Premium black jacket with modern design",
-    details: "High-quality materials with water-resistant coating",
-    care: "Dry clean only",
-    shipping: "Free shipping on orders over 50€"
-  },
-  {
-    id: 6,
-    name: "Black Outfit",
-    price: "$199",
-    images: [
-      "/541V01A1699X8830_E01.jpeg",
-      "/LOOK_H_25_4_LOOK_070_E01.webp",
-      "/LOOK_H_25_4_LOOK_070_E02.webp",
-      "/493C424D6500C980_E01.jpeg"
-    ],
-    category: "Sets",
-    colors: ["Black", "Charcoal"],
-    sizes: ["S", "M", "L", "XL"],
-    description: "Complete black outfit set for modern style",
-    details: "Coordinated pieces for a complete look",
-    care: "Machine wash cold, tumble dry low",
-    shipping: "Free shipping on orders over 50€"
-  },
-  {
-    id: 7,
-    name: "Premium Hoodie",
-    price: "$229",
-    images: [
-      "/LOOK_H_25_4_LOOK_070_E01.webp",
-      "/LOOK_H_25_4_LOOK_070_E02.webp",
-      "/LOOK_H_25_4_LOOK_070_E03.webp",
-      "/LOOK_H_25_4_LOOK_070_E04.webp"
-    ],
-    category: "Hoodies",
-    colors: ["Black", "Gray", "White"],
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    description: "Premium quality hoodie with superior comfort",
-    details: "Premium cotton blend with reinforced stitching",
-    care: "Machine wash cold, tumble dry low",
-    shipping: "Free shipping on orders over 50€"
-  },
-  {
-    id: 8,
-    name: "Urban Jacket",
-    price: "$299",
-    images: [
-      "/493C424D6500C980_E01.jpeg",
-      "/LOOK_H_25_4_LOOK_070_E01.webp",
-      "/LOOK_H_25_4_LOOK_070_E02.webp",
-      "/541V01A1699X8830_E01.jpeg"
-    ],
-    category: "Jackets",
-    colors: ["Black", "Olive", "Navy"],
-    sizes: ["S", "M", "L", "XL"],
-    description: "Urban style jacket for city adventures",
-    details: "Durable fabric with multiple pockets",
-    care: "Machine wash cold, hang dry",
-    shipping: "Free shipping on orders over 50€"
-  },
-  {
-    id: 9,
-    name: "Complete Set",
-    price: "$349",
-    images: [
-      "/541V01A1699X8830_E01.jpeg",
-      "/493C424D6500C980_E01.jpeg",
-      "/LOOK_H_25_4_LOOK_070_E01.webp",
-      "/LOOK_H_25_4_LOOK_070_E02.webp"
-    ],
-    category: "Sets",
-    colors: ["Black", "Charcoal", "Navy"],
-    sizes: ["S", "M", "L", "XL"],
-    description: "Complete outfit set with all essentials",
-    details: "Full coordinated set for any occasion",
-    care: "Machine wash cold, tumble dry low",
-    shipping: "Free shipping on orders over 50€"
-  },
-  {
-    id: 10,
-    name: "Oversized Hoodie",
-    price: "$209",
-    images: [
-      "/LOOK_H_25_4_LOOK_070_E02.webp",
-      "/LOOK_H_25_4_LOOK_070_E01.webp",
-      "/LOOK_H_25_4_LOOK_070_E03.webp",
-      "/LOOK_H_25_4_LOOK_070_E04.webp"
-    ],
-    category: "Hoodies",
-    colors: ["Black", "Gray"],
-    sizes: ["M", "L", "XL", "XXL"],
-    description: "Oversized hoodie for ultimate comfort",
-    details: "Relaxed fit with dropped shoulders",
-    care: "Machine wash cold, tumble dry low",
-    shipping: "Free shipping on orders over 50€"
-  },
-  {
-    id: 11,
-    name: "Bomber Jacket",
-    price: "$279",
-    images: [
-      "/493C424D6500C980_E01.jpeg",
-      "/LOOK_H_25_4_LOOK_070_E01.webp",
-      "/LOOK_H_25_4_LOOK_070_E02.webp",
-      "/541V01A1699X8830_E01.jpeg"
-    ],
-    category: "Jackets",
-    colors: ["Black", "Olive"],
-    sizes: ["S", "M", "L", "XL"],
-    description: "Classic bomber jacket with modern twist",
-    details: "Lightweight yet durable construction",
-    care: "Machine wash cold, hang dry",
-    shipping: "Free shipping on orders over 50€"
-  },
-  {
-    id: 12,
-    name: "Casual Set",
-    price: "$259",
-    images: [
-      "/541V01A1699X8830_E01.jpeg",
-      "/LOOK_H_25_4_LOOK_070_E01.webp",
-      "/493C424D6500C980_E01.jpeg",
-      "/LOOK_H_25_4_LOOK_070_E02.webp"
-    ],
-    category: "Sets",
-    colors: ["Black", "Gray"],
-    sizes: ["S", "M", "L", "XL"],
-    description: "Casual set perfect for everyday wear",
-    details: "Comfortable and versatile pieces",
-    care: "Machine wash cold, tumble dry low",
-    shipping: "Free shipping on orders over 50€"
-  },
-  {
-    id: 13,
-    name: "Zip Hoodie",
-    price: "$199",
-    images: [
-      "/LOOK_H_25_4_LOOK_070_E03.webp",
-      "/LOOK_H_25_4_LOOK_070_E01.webp",
-      "/LOOK_H_25_4_LOOK_070_E02.webp",
-      "/LOOK_H_25_4_LOOK_070_E04.webp"
-    ],
-    category: "Hoodies",
-    colors: ["Black", "Gray"],
-    sizes: ["S", "M", "L", "XL"],
-    description: "Zip-up hoodie for versatile styling",
-    details: "Full-zip design with kangaroo pocket",
-    care: "Machine wash cold, tumble dry low",
-    shipping: "Free shipping on orders over 50€"
-  },
-  {
-    id: 14,
-    name: "Denim Jacket",
-    price: "$319",
-    images: [
-      "/493C424D6500C980_E01.jpeg",
-      "/LOOK_H_25_4_LOOK_070_E01.webp",
-      "/541V01A1699X8830_E01.jpeg",
-      "/LOOK_H_25_4_LOOK_070_E02.webp"
-    ],
-    category: "Jackets",
-    colors: ["Black", "Indigo"],
-    sizes: ["S", "M", "L", "XL"],
-    description: "Classic denim jacket with modern fit",
-    details: "Premium denim with vintage wash",
-    care: "Machine wash cold, hang dry",
-    shipping: "Free shipping on orders over 50€"
-  },
-  {
-    id: 15,
-    name: "Sport Set",
-    price: "$289",
-    images: [
-      "/541V01A1699X8830_E01.jpeg",
-      "/LOOK_H_25_4_LOOK_070_E01.webp",
-      "/LOOK_H_25_4_LOOK_070_E02.webp",
-      "/493C424D6500C980_E01.jpeg"
-    ],
-    category: "Sets",
-    colors: ["Black", "Navy"],
-    sizes: ["S", "M", "L", "XL"],
-    description: "Athletic set for active lifestyle",
-    details: "Moisture-wicking fabric with stretch",
-    care: "Machine wash cold, tumble dry low",
-    shipping: "Free shipping on orders over 50€"
-  }
-];
+import { getProductById, getRelatedProducts, products } from '@/data/products';
 
 export default function ProductDetailPage() {
   const params = useParams();
-  const productId = parseInt(params.id as string);
-  const product = products.find(p => p.id === productId);
+  const productId = params.id as string;
+  const product = getProductById(productId);
   
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState(0);
@@ -306,7 +34,6 @@ export default function ProductDetailPage() {
   const ovelaY = useTransform(scrollYProgress, [0, 1], [0, -50]);
   
   // Scroll animation for OVELA reveal effect
-  const ovelaRef = useRef(null);
   const [ovelaInView, setOvelaInView] = useState(false);
   
   useEffect(() => {
@@ -410,7 +137,7 @@ export default function ProductDetailPage() {
                 {/* Product Name and Price */}
                 <div className="text-center lg:text-left">
                   <h1 className="text-2xl md:text-3xl font-bold mb-2 leading-tight">{product.name}</h1>
-                  <p className="text-xl md:text-2xl font-semibold">{product.price}</p>
+                  <p className="text-xl md:text-2xl font-semibold">₹{product.price.toLocaleString('en-IN')}</p>
                 </div>
 
                 {/* Color Selection */}
@@ -474,17 +201,9 @@ export default function ProductDetailPage() {
                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                          </svg>
                        </motion.button>
-                       <input
-                         type="number"
-                         value={quantity}
-                         onChange={(e) => {
-                           const value = parseInt(e.target.value) || 1;
-                           setQuantity(Math.max(1, Math.min(10, value)));
-                         }}
-                         className="w-16 py-3 text-center bg-transparent border-none outline-none text-white"
-                         min="1"
-                         max="10"
-                       />
+                       <div className="w-16 py-3 text-center text-white font-medium">
+                         {quantity}
+                       </div>
                        <motion.button
                          onClick={() => setQuantity(Math.min(10, quantity + 1))}
                          className="px-4 py-3 hover:bg-gray-700 transition-colors touch-manipulation"
@@ -520,6 +239,7 @@ export default function ProductDetailPage() {
 
                 {/* Enhanced Product Details */}
                 <div className="space-y-3 pt-6 border-t border-gray-700">
+                  {/* Personalized Product Details */}
                   <motion.details 
                     className="group bg-gray-900/50 rounded-lg overflow-hidden"
                     whileHover={{ backgroundColor: "rgba(31, 41, 55, 0.6)" }}
@@ -533,11 +253,54 @@ export default function ProductDetailPage() {
                         +
                       </motion.span>
                     </summary>
-                    <div className="px-4 pb-4">
-                      <p className="text-sm text-gray-300 leading-relaxed">{product.details}</p>
+                    <div className="px-4 pb-4 space-y-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-white mb-2">Material</h4>
+                        <p className="text-sm text-gray-300 leading-relaxed">{product.material}</p>
+                      </div>
+                      
+                      {product.details && (
+                        <>
+                          {product.details.origin && (
+                            <div>
+                              <h4 className="text-sm font-medium text-white mb-2">Origin</h4>
+                              <p className="text-sm text-gray-300 leading-relaxed">{product.details.origin}</p>
+                            </div>
+                          )}
+                          
+                          {product.details.craftsmanship && (
+                            <div>
+                              <h4 className="text-sm font-medium text-white mb-2">Craftsmanship</h4>
+                              <p className="text-sm text-gray-300 leading-relaxed">{product.details.craftsmanship}</p>
+                            </div>
+                          )}
+                          
+                          {product.details.artisanStory && (
+                            <div>
+                              <h4 className="text-sm font-medium text-white mb-2">Artisan Story</h4>
+                              <p className="text-sm text-gray-300 leading-relaxed">{product.details.artisanStory}</p>
+                            </div>
+                          )}
+                          
+                          {product.details.uniqueFeatures && product.details.uniqueFeatures.length > 0 && (
+                            <div>
+                              <h4 className="text-sm font-medium text-white mb-2">Unique Features</h4>
+                              <ul className="text-sm text-gray-300 space-y-1">
+                                {product.details.uniqueFeatures.map((feature, index) => (
+                                  <li key={index} className="flex items-start">
+                                    <span className="text-white mr-2">•</span>
+                                    {feature}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </>
+                      )}
                     </div>
                   </motion.details>
                   
+                  {/* Product Care */}
                   <motion.details 
                     className="group bg-gray-900/50 rounded-lg overflow-hidden"
                     whileHover={{ backgroundColor: "rgba(31, 41, 55, 0.6)" }}
@@ -551,11 +314,53 @@ export default function ProductDetailPage() {
                         +
                       </motion.span>
                     </summary>
-                    <div className="px-4 pb-4">
-                      <p className="text-sm text-gray-300 leading-relaxed">{product.care}</p>
+                    <div className="px-4 pb-4 space-y-4">
+                      {product.care ? (
+                        <>
+                          {product.care.instructions && product.care.instructions.length > 0 && (
+                            <div>
+                              <h4 className="text-sm font-medium text-white mb-2">Care Instructions</h4>
+                              <ul className="text-sm text-gray-300 space-y-1">
+                                {product.care.instructions.map((instruction, index) => (
+                                  <li key={index} className="flex items-start">
+                                    <span className="text-white mr-2">•</span>
+                                    {instruction}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          
+                          {product.care.warnings && product.care.warnings.length > 0 && (
+                            <div>
+                              <h4 className="text-sm font-medium text-red-400 mb-2">Important Warnings</h4>
+                              <ul className="text-sm text-red-300 space-y-1">
+                                {product.care.warnings.map((warning, index) => (
+                                  <li key={index} className="flex items-start">
+                                    <span className="text-red-400 mr-2">•</span>
+                                    {warning}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          
+                          {product.care.professionalCare && (
+                            <div className="bg-yellow-900/20 border border-yellow-700/30 rounded-lg p-3">
+                              <p className="text-sm text-yellow-300 flex items-center">
+                                <span className="mr-2">•</span>
+                                Professional care recommended for optimal maintenance
+                              </p>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <p className="text-sm text-gray-300 leading-relaxed">Machine wash cold, tumble dry low. For best results, wash inside out.</p>
+                      )}
                     </div>
                   </motion.details>
                   
+                  {/* Shipping & Returns */}
                   <motion.details 
                     className="group bg-gray-900/50 rounded-lg overflow-hidden"
                     whileHover={{ backgroundColor: "rgba(31, 41, 55, 0.6)" }}
@@ -569,8 +374,71 @@ export default function ProductDetailPage() {
                         +
                       </motion.span>
                     </summary>
-                    <div className="px-4 pb-4">
-                      <p className="text-sm text-gray-300 leading-relaxed">{product.shipping}</p>
+                    <div className="px-4 pb-4 space-y-4">
+                      {/* Shipping Information */}
+                      {product.shipping && (
+                        <div>
+                          <h4 className="text-sm font-medium text-white mb-2">Shipping</h4>
+                          <div className="space-y-2">
+                            {product.shipping.freeShippingThreshold && (
+                              <p className="text-sm text-green-300 flex items-center">
+                                <span className="mr-2">•</span>
+                                Free shipping on orders over ₹{(product.shipping.freeShippingThreshold * 90).toLocaleString('en-IN')}
+                              </p>
+                            )}
+                            <p className="text-sm text-gray-300">
+                              <span className="font-medium">Estimated Delivery:</span> {product.shipping.estimatedDelivery}
+                            </p>
+                            {product.shipping.expeditedOptions && product.shipping.expeditedOptions.length > 0 && (
+                              <div>
+                                <p className="text-sm font-medium text-white mb-1">Expedited Options:</p>
+                                <ul className="text-sm text-gray-300 space-y-1">
+                                  {product.shipping.expeditedOptions.map((option, index) => (
+                                    <li key={index} className="flex items-start">
+                                      <span className="text-white mr-2">•</span>
+                                      {option}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Returns Information */}
+                      {product.returns && (
+                        <div>
+                          <h4 className="text-sm font-medium text-white mb-2">Returns</h4>
+                          <div className="space-y-2">
+                            <p className="text-sm text-blue-300 flex items-center">
+                              <span className="mr-2">•</span>
+                              {product.returns.policy}
+                            </p>
+                            <p className="text-sm text-gray-300">
+                              <span className="font-medium">Return Window:</span> {product.returns.timeframe}
+                            </p>
+                            {product.returns.conditions && product.returns.conditions.length > 0 && (
+                              <div>
+                                <p className="text-sm font-medium text-white mb-1">Return Conditions:</p>
+                                <ul className="text-sm text-gray-300 space-y-1">
+                                  {product.returns.conditions.map((condition, index) => (
+                                    <li key={index} className="flex items-start">
+                                      <span className="text-white mr-2">•</span>
+                                      {condition}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Fallback for products without enhanced data */}
+                      {!product.shipping && !product.returns && (
+                        <p className="text-sm text-gray-300 leading-relaxed">Free shipping on orders over ₹4,500. Returns accepted within 30 days.</p>
+                      )}
                     </div>
                   </motion.details>
                 </div>
@@ -591,32 +459,46 @@ export default function ProductDetailPage() {
             <p className="text-gray-300">Discover more from our collection</p>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {products.slice(0, 4).filter(p => p.id !== product.id).map((relatedProduct, index) => (
-              <motion.div
+          <div 
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
+            role="grid"
+            aria-label="Related products"
+          >
+            {getRelatedProducts(productId, 4).map((relatedProduct, index) => (
+              <motion.article
                 key={relatedProduct.id}
-                className="group cursor-pointer"
+                className="group"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 whileHover={{ y: -5 }}
+                role="gridcell"
               >
-                <div className="aspect-square bg-gray-800 rounded-xl overflow-hidden mb-3">
-                  <Image
-                    src={relatedProduct.images[0]}
-                    alt={relatedProduct.name}
-                    width={300}
-                    height={300}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="text-center">
-                  <h3 className="font-medium text-white mb-1 text-sm md:text-base group-hover:text-gray-200 transition-colors">
-                    {relatedProduct.name}
-                  </h3>
-                  <p className="text-gray-300 text-sm md:text-base">{relatedProduct.price}</p>
-                </div>
-              </motion.div>
+                <a
+                  href={`/products/${relatedProduct.id}`}
+                  className="block focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black rounded-xl transition-all duration-200"
+                  aria-label={`View ${relatedProduct.name} for ₹${relatedProduct.price.toLocaleString('en-IN')}`}
+                  tabIndex={0}
+                >
+                  <div className="aspect-square bg-gray-800 rounded-xl overflow-hidden mb-3">
+                    <Image
+                      src={relatedProduct.images[0]}
+                      alt={`${relatedProduct.name} product image`}
+                      width={300}
+                      height={300}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="font-medium text-white mb-1 text-sm md:text-base group-hover:text-gray-200 transition-colors">
+                      {relatedProduct.name}
+                    </h3>
+                    <p className="text-gray-300 text-sm md:text-base" aria-label={`Price: ${relatedProduct.price} rupees`}>
+                      ₹{relatedProduct.price.toLocaleString('en-IN')}
+                    </p>
+                  </div>
+                </a>
+              </motion.article>
             ))}
           </div>
         </motion.div>
@@ -687,13 +569,12 @@ export default function ProductDetailPage() {
       )}
       
       {/* Footer with faster scroll */}
-      <motion.div style={{ y: footerY }} className="mt-8">
+      <motion.div style={{ y: footerY }} className="mt-24 md:mt-32">
         <Footer />
       </motion.div>
       
       {/* OVELA Section with slower scroll and reveal effect */}
       <motion.div 
-        ref={ovelaRef}
         className="w-full h-[60vh] lg:h-[70vh] xl:h-[80vh] flex items-center justify-center bg-black text-white relative z-10 -mt-16"
         style={{ y: ovelaY }}
       >

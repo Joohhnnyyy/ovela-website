@@ -53,7 +53,7 @@ const CategoryCard = ({ href, imgSrc, categoryName, index, imageBlurVariants, is
   return (
     <motion.a 
       href={href} 
-      className="grid rounded-md overflow-hidden group aspect-[380/480] relative"
+      className="grid rounded-md overflow-hidden group aspect-[380/480] relative focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black transition-all duration-200"
       variants={cardVariants}
       initial="hidden"
       whileInView="visible"
@@ -63,6 +63,8 @@ const CategoryCard = ({ href, imgSrc, categoryName, index, imageBlurVariants, is
         boxShadow: "0 25px 50px rgba(0, 0, 0, 0.4)"
       }}
       transition={{ duration: 0.3, ease: "easeOut" }}
+      aria-label={`Browse ${categoryName} collection`}
+      role="link"
     >
       <motion.div
         whileHover={{ scale: 1.05 }}
@@ -77,7 +79,7 @@ const CategoryCard = ({ href, imgSrc, categoryName, index, imageBlurVariants, is
         >
           <Image
             src={imgSrc}
-            alt={categoryName}
+            alt={`${categoryName} category showcase image`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover"
@@ -180,17 +182,20 @@ const ProductsCategories = () => {
         <motion.div 
           className="grid grid-cols-1 sm:grid-cols-3 gap-5"
           variants={childVariants}
+          role="grid"
+          aria-label="Product categories"
         >
           {categories.map((category, index) => (
-            <CategoryCard
-              key={category.name}
-              href={category.href}
-              imgSrc={category.image}
-              categoryName={category.name}
-              index={index}
-              imageBlurVariants={imageBlurVariants}
-              isInView={isInView}
-            />
+            <div key={category.name} role="gridcell">
+              <CategoryCard
+                href={category.href}
+                imgSrc={category.image}
+                categoryName={category.name}
+                index={index}
+                imageBlurVariants={imageBlurVariants}
+                isInView={isInView}
+              />
+            </div>
           ))}
         </motion.div>
       </div>

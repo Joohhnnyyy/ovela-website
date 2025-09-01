@@ -180,17 +180,22 @@ export default function SetsPage() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4" role="grid" aria-label="Sets collection">
             {paginatedProducts.map((product, index) => (
-              <motion.div
+              <motion.article
                 key={product.id}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 * index }}
                 whileHover={{ y: -2 }}
                 className="group cursor-pointer"
+                role="gridcell"
               >
-                <Link href={`/products/${product.id}`}>
+                <Link 
+                  href={`/products/${product.id}`}
+                  className="focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black rounded-lg transition-all duration-200"
+                  aria-label={`View ${product.name} for ${product.price}`}
+                >
                   <div className="relative overflow-hidden bg-gray-100 mb-3 rounded-lg">
                     <motion.div
                       variants={imageBlurVariants}
@@ -235,7 +240,7 @@ export default function SetsPage() {
                     <p className="text-white/60 text-xs uppercase tracking-wider">{product.price}</p>
                   </div>
                 </Link>
-              </motion.div>
+              </motion.article>
             ))}
           </div>
         </motion.div>

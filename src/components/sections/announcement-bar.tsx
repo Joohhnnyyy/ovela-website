@@ -6,7 +6,7 @@ import Link from "next/link";
 
 const announcements = [
   "“Memory” collection now available",
-  "Free delivery on orders over €160",
+  "Free delivery on orders over ₹14,400",
 ];
 
 const AnnouncementBar = () => {

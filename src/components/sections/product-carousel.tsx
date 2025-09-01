@@ -20,7 +20,7 @@ const products: Product[] = [
     id: 1,
     name: 'Amnesia',
     href: '/en/products/amnesia',
-    price: '40€',
+    price: '₹3,600',
     imageSrc: 'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/Amnesia-Focus-22.webp?',
     imageAlt: 'Black bucket hat on a light background',
   },
@@ -28,7 +28,7 @@ const products: Product[] = [
     id: 2,
     name: 'Quiet remorse',
     href: '/en/products/quiet-remorse-noir',
-    price: '64€',
+    price: '₹5,760',
     imageSrc: 'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/Remose-Focus-23.webp?',
     imageAlt: 'Black t-shirt with a white graphic on a light background',
   },
@@ -36,7 +36,7 @@ const products: Product[] = [
     id: 3,
     name: 'Fragment',
     href: '/en/products/fragment',
-    price: '160€',
+    price: '₹14,400',
     imageSrc: 'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/Fragment-Focus-24.webp?',
     imageAlt: 'Black hoodie with a white graphic on a light background',
   },
@@ -44,7 +44,7 @@ const products: Product[] = [
     id: 4,
     name: 'Quiet remorse blue',
     href: '/en/products/quiet-remorse-bleu',
-    price: '64€',
+    price: '₹5,760',
     imageSrc: 'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/RemoseB-Focus-25.webp?',
     imageAlt: 'Blue t-shirt with a white graphic on a light background',
   },
@@ -52,7 +52,7 @@ const products: Product[] = [
     id: 5,
     name: 'Amnesia blue',
     href: '/en/products/amnesia-bleu',
-    price: '40€',
+    price: '₹3,600',
     imageSrc: 'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/AmnesiaB-Focus-26.webp?',
     imageAlt: 'Blue bucket hat on a light background',
   },
@@ -85,9 +85,11 @@ const ProductCarousel = () => {
         <motion.div 
           className="flex gap-6 overflow-x-auto pb-4 scroll-smooth scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/20 hover:scrollbar-thumb-white/40"
           variants={childVariants}
+          role="region"
+          aria-label="Product carousel"
         >
           {products.map((product, index) => (
-            <motion.div 
+            <motion.article 
               key={product.id} 
               className="w-[220px] flex-shrink-0 lg:w-[260px]"
               variants={productVariants}
@@ -97,7 +99,11 @@ const ProductCarousel = () => {
               viewport={{ once: true, margin: "-10%" }}
               transition={{ delay: index * 0.1 }}
             >
-              <Link href={product.href} className="group grid gap-y-6 cursor-interactive">
+              <Link 
+                href={product.href} 
+                className="group grid gap-y-6 cursor-interactive focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black rounded-lg transition-all duration-200"
+                aria-label={`View ${product.name} for ${product.price}`}
+              >
                 <motion.div 
                   className="aspect-[4/5] overflow-hidden rounded-md bg-off-white"
                   whileHover={{ 
@@ -148,7 +154,7 @@ const ProductCarousel = () => {
                   </motion.p>
                 </motion.div>
               </Link>
-            </motion.div>
+            </motion.article>
           ))}
         </motion.div>
       </div>

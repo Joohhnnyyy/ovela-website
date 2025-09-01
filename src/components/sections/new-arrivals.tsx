@@ -30,7 +30,7 @@ const productsData: Product[] = [
     id: 1,
     name: 'Fragment',
     type: 'Hoodie',
-    price: '160€',
+    price: '₹14,400',
     isNew: true,
     productUrl: '/en/products/fragment',
     sizes: ['S', 'M', 'L', 'XL'],
@@ -50,7 +50,7 @@ const productsData: Product[] = [
     id: 2,
     name: 'Amnesia',
     type: 'Bucket hat',
-    price: '40€',
+    price: '₹3,600',
     isNew: true,
     productUrl: '/en/products/amnesia-bleu',
     sizes: ['TU'],
@@ -75,7 +75,7 @@ const productsData: Product[] = [
     id: 3,
     name: 'Quiet remorse',
     type: 'T-shirt',
-    price: '64€',
+    price: '₹5,760',
     isNew: true,
     productUrl: '/en/products/quiet-remorse-noir',
     sizes: ['S', 'M', 'L', 'XL'],
@@ -136,7 +136,11 @@ function ProductCard({ product, index, imageBlurVariants, isInView }: { product:
       viewport={{ once: true, margin: "-10%" }}
     >
       <div className="relative group overflow-hidden rounded-sm">
-        <Link href={product.productUrl} passHref>
+        <Link 
+          href={product.productUrl} 
+          className="block focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black rounded-sm transition-all duration-200"
+          aria-label={`View ${product.name} ${product.type} for ${product.price}`}
+        >
           <motion.div 
             className="overflow-hidden rounded-sm"
             whileHover={{ scale: 1.02 }}
@@ -150,7 +154,7 @@ function ProductCard({ product, index, imageBlurVariants, isInView }: { product:
             >
               <Image
                 src={currentImage}
-                alt={`${product.name} ${product.type}`}
+                alt={`${product.name} ${product.type} product image`}
                 width={580}
                 height={725}
                 className="w-full h-full object-cover aspect-[580/725] transition-transform duration-300 group-hover:scale-105"
@@ -188,7 +192,13 @@ function ProductCard({ product, index, imageBlurVariants, isInView }: { product:
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="bg-transparent border-gray-600 text-white hover:bg-white hover:text-black h-9 w-9 rounded-[4px] transition-all duration-200"
+                    className="bg-transparent border-gray-600 text-white hover:bg-white hover:text-black h-9 w-9 rounded-[4px] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white"
+                    aria-label={`Add ${product.name} size ${size} to cart`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      // Add to cart functionality would go here
+                    }}
                   >
                     {size}
                   </Button>
@@ -240,9 +250,10 @@ function ProductCard({ product, index, imageBlurVariants, isInView }: { product:
                 key={variant.colorHex}
                 onMouseEnter={() => handleVariantHover(variantIndex)}
                 onClick={() => handleVariantHover(variantIndex)}
-                aria-label={`Color ${variant.colorHex}`}
+                aria-label={`Select ${variant.colorHex === '#141414' ? 'black' : variant.colorHex === '#072f83' ? 'blue' : 'color'} variant`}
+                aria-pressed={variantIndex === activeVariantIndex}
                 className={cn(
-                  'w-5 h-5 rounded-full border border-transparent transition-all duration-200',
+                  'w-5 h-5 rounded-full border border-transparent transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-1 focus:ring-offset-black',
                    variantIndex === activeVariantIndex ? 'ring-2 ring-offset-2 ring-offset-black ring-white' : 'hover:ring-1 hover:ring-white/50'
                 )}
                 style={{ backgroundColor: variant.colorHex }}
@@ -306,7 +317,7 @@ export default function NewArrivals() {
             </Link>
           </div>
         </motion.div>
-        <div className="grid grid-cols-1 gap-x-5 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-x-5 gap-y-8 md:grid-cols-2 lg:grid-cols-3" role="grid" aria-label="New arrivals products">
           {productsData.map((product, index) => (
             <ProductCard key={product.id} product={product} index={index} imageBlurVariants={imageBlurVariants} isInView={isInView} />
           ))}
