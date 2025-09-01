@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, ShoppingBag, X, ChevronDown } from 'lucide-react';
+import { Menu, ShoppingBag, X, ChevronDown, User, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/contexts/AuthContext';
 
 const navLinkClasses = "flex items-center text-white uppercase text-sm font-normal tracking-wider hover:opacity-70 transition-opacity cursor-interactive";
 
@@ -11,6 +12,15 @@ const navLinkClasses = "flex items-center text-white uppercase text-sm font-norm
 
 export default function Navigation() {
   const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
+  const { currentUser, logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   const headerVariants = {
     hidden: { y: -75, opacity: 0 },
@@ -161,36 +171,69 @@ export default function Navigation() {
             </motion.div>
           </motion.div>
 
-          {/* Right Side: Bag */}
+          {/* Right Side: Auth & Bag */}
           <motion.div 
             className="flex-1 flex justify-end"
             variants={itemVariants}
           >
-            <div className="flex items-center">
+            <div className="flex items-center gap-x-4">
+              {/* Mobile Menu */}
               <motion.button 
                 aria-label="Open bag" 
-                className={`${navLinkClasses} p-2 -mr-2 lg:hidden`}
+                className={`${navLinkClasses} p-2 lg:hidden`}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 transition={{ duration: 0.2 }}
               >
                 <ShoppingBag size={24} />
               </motion.button>
-              <motion.button 
-                aria-label="Open bag with 0 items" 
-                className={`${navLinkClasses} hidden lg:flex items-center gap-x-1.5`}
-                whileHover={{ x: 3 }}
-                transition={{ duration: 0.2 }}
-              >
-                <span>Bag</span>
-                <span>/</span>
-                <motion.span
-                  whileHover={{ scale: 1.2 }}
+              
+              {/* Desktop Auth Links */}
+              <div className="hidden lg:flex items-center gap-x-6">
+                {currentUser ? (
+                  <div className="flex items-center gap-x-4">
+                    <span className={`${navLinkClasses} cursor-default`}>
+                      <User size={16} className="mr-1" />
+                      {currentUser.displayName || currentUser.email}
+                    </span>
+                    <motion.button
+                      onClick={handleLogout}
+                      className={navLinkClasses}
+                      whileHover={{ y: -2 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <LogOut size={16} className="mr-1" />
+                      Logout
+                    </motion.button>
+                  </div>
+                ) : (
+                  <motion.div
+                    whileHover={{ y: -2 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Link href="/auth/login" className={navLinkClasses}>
+                      <User size={16} className="mr-1" />
+                      Login
+                    </Link>
+                  </motion.div>
+                )}
+                
+                <motion.button 
+                  aria-label="Open bag with 0 items" 
+                  className={`${navLinkClasses} flex items-center gap-x-1.5`}
+                  whileHover={{ x: 3 }}
                   transition={{ duration: 0.2 }}
                 >
-                  0
-                </motion.span>
-              </motion.button>
+                  <span>Bag</span>
+                  <span>/</span>
+                  <motion.span
+                    whileHover={{ scale: 1.2 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    0
+                  </motion.span>
+                </motion.button>
+              </div>
             </div>
           </motion.div>
         </motion.header>
