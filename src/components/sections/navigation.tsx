@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, ShoppingBag, X } from 'lucide-react';
+import { Menu, ShoppingBag, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const navLinkClasses = "flex items-center text-white uppercase text-sm font-normal tracking-wider hover:opacity-70 transition-opacity cursor-interactive";
@@ -10,6 +10,7 @@ const navLinkClasses = "flex items-center text-white uppercase text-sm font-norm
 
 
 export default function Navigation() {
+  const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
 
   const headerVariants = {
     hidden: { y: -75, opacity: 0 },
@@ -72,8 +73,55 @@ export default function Navigation() {
             </motion.button>
             <nav aria-label="menu principale" className="hidden lg:block">
               <ul role="menu" className="flex gap-x-8">
+                {/* Shop Dropdown */}
+                <motion.li 
+                  role="menuitem"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.4 }}
+                  className="relative"
+                  onMouseEnter={() => setIsShopDropdownOpen(true)}
+                  onMouseLeave={() => setIsShopDropdownOpen(false)}
+                >
+                  <motion.div
+                    whileHover={{ y: -2 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex items-center gap-1"
+                  >
+                    <Link href="/collections/all" className={navLinkClasses}>Shop</Link>
+                    <ChevronDown size={16} className="text-white" />
+                  </motion.div>
+                  
+                  <AnimatePresence>
+                    {isShopDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute top-full left-0 mt-2 bg-black/90 backdrop-blur-lg border border-white/10 rounded-lg p-4 min-w-[200px]"
+                      >
+                        <div className="flex flex-col gap-3">
+                          <Link href="/collections/all" className="text-white text-sm uppercase tracking-wider hover:opacity-70 transition-opacity">
+                            All Products
+                          </Link>
+                          <Link href="/collections/hoodies" className="text-white text-sm uppercase tracking-wider hover:opacity-70 transition-opacity">
+                            Hoodies
+                          </Link>
+                          <Link href="/collections/jackets" className="text-white text-sm uppercase tracking-wider hover:opacity-70 transition-opacity">
+                            Jackets
+                          </Link>
+                          <Link href="/collections/sets" className="text-white text-sm uppercase tracking-wider hover:opacity-70 transition-opacity">
+                            Sets
+                          </Link>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.li>
+                
+                {/* Other Navigation Items */}
                 {[
-                  { href: "/collections/all", text: "Shop" },
                   { href: "/pages/about", text: "About" },
                   { href: "/pages/lookbook", text: "Lookbook" }
                 ].map((link, index) => (
@@ -82,7 +130,7 @@ export default function Navigation() {
                     role="menuitem"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 + index * 0.1, duration: 0.4 }}
+                    transition={{ delay: 0.3 + index * 0.1, duration: 0.4 }}
                   >
                     <motion.div
                       whileHover={{ y: -2 }}

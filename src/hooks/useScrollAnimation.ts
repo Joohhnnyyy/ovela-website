@@ -37,15 +37,13 @@ export const useScrollAnimation = (options?: {
   const imageBlurVariants: Variants = {
     hidden: {
       opacity: 0,
-      filter: "blur(20px)",
-      scale: 1.1
+      scale: 1.02
     },
     visible: {
       opacity: 1,
-      filter: "blur(0px)",
       scale: 1,
       transition: {
-        duration: 1,
+        duration: 0.4,
         ease: "easeOut"
       }
     }
