@@ -13,7 +13,8 @@ import {
   startAfter,
   serverTimestamp,
   Timestamp,
-  writeBatch
+  writeBatch,
+  runTransaction
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { 
@@ -126,38 +127,60 @@ export class PurchaseService {
         updatedAt: new Date()
       };
 
-      // Use batch write to create purchase and update inventory
-      const batch = writeBatch(db);
-      
-      // Add purchase document
-      batch.set(purchaseRef, {
-        ...purchaseData,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
-
-      // Update product inventory for each item
-      for (const item of purchaseItems) {
-        const productResult = await ProductService.decreaseInventory(
-          item.productId,
-          item.size,
-          item.color,
-          item.quantity
-        );
+      // Use transaction to ensure atomic operations
+      await runTransaction(db, async (transaction) => {
+        // First, check and reserve inventory for all items
+        const productRefs = new Map();
+        const inventoryUpdates = new Map();
         
-        if (!productResult.success) {
-          return {
-            success: false,
-            error: `Failed to update inventory for ${item.product.name}: ${productResult.error}`
-          };
+        for (const item of purchaseItems) {
+          const productRef = doc(db, 'products', item.productId);
+          const productSnap = await transaction.get(productRef);
+          
+          if (!productSnap.exists()) {
+            throw new Error(`Product ${item.product.name} not found`);
+          }
+          
+          const productData = productSnap.data();
+          const inventory = productData.inventory || [];
+          const inventoryIndex = inventory.findIndex(
+            (inv: any) => inv.size === item.size && inv.color === item.color
+          );
+          
+          if (inventoryIndex < 0) {
+            throw new Error(`Inventory not found for ${item.product.name} (${item.size}, ${item.color})`);
+          }
+          
+          const currentQuantity = inventory[inventoryIndex].quantity;
+          if (currentQuantity < item.quantity) {
+            throw new Error(`Insufficient inventory for ${item.product.name}. Available: ${currentQuantity}, Requested: ${item.quantity}`);
+          }
+          
+          // Prepare inventory update
+          inventory[inventoryIndex].quantity = currentQuantity - item.quantity;
+          productRefs.set(item.productId, productRef);
+          inventoryUpdates.set(item.productId, {
+            inventory,
+            updatedAt: serverTimestamp()
+          });
         }
-      }
-
-      // Clear user's cart
+        
+        // Create purchase document
+        transaction.set(purchaseRef, {
+          ...purchaseData,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+        
+        // Update all product inventories
+        for (const [productId, productRef] of productRefs) {
+          const updates = inventoryUpdates.get(productId);
+          transaction.update(productRef, updates);
+        }
+      });
+      
+      // Clear user's cart after successful transaction
       await CartService.clearCart(userId);
-
-      // Commit the batch
-      await batch.commit();
 
       const purchase: Purchase = {
         id: purchaseRef.id,

@@ -651,6 +651,19 @@ export class CartService {
   }
 
   /**
+   * Set local cart data (used by sync service)
+   */
+  static async setLocalCart(userId: string, cart: Cart): Promise<ApiResponse<Cart>> {
+    try {
+      LocalCartStorage.setCart(userId, cart);
+      return { success: true, data: cart };
+    } catch (error) {
+      console.error('Error setting local cart:', error);
+      return { success: false, error: 'Failed to set local cart' };
+    }
+  }
+
+  /**
    * Check if item exists in cart
    */
   static async isItemInCart(

@@ -133,34 +133,22 @@ class InventoryService {
         return false;
       }
 
-      // Reserve stock for each item
-      for (const item of items) {
-        const inventory = await this.getInventory(item.productId, item.variantId);
-        if (!inventory) continue;
+      // Use transaction to ensure atomicity
+      const { data, error } = await (supabase as any).rpc('reserve_stock_atomic', {
+        items_data: items.map(item => ({
+          product_id: item.productId,
+          variant_id: item.variantId || null,
+          quantity: item.quantity
+        })),
+        order_id: orderId
+      });
 
-        // Update reserved quantity
-        const { error: updateError } = await supabase
-          .from('inventory')
-          .update({
-            reserved_quantity: inventory.reservedQuantity + item.quantity,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', inventory.id);
-
-        if (updateError) throw updateError;
-
-        // Record movement
-        await this.recordMovement({
-          inventory_id: inventory.id,
-          movement_type: 'reserved',
-          quantity: item.quantity,
-          reference_type: 'order',
-          reference_id: orderId,
-          reason: 'Stock reserved for order'
-        });
+      if (error) {
+        console.error('Error in atomic stock reservation:', error);
+        return false;
       }
 
-      return true;
+      return data === true;
     } catch (error) {
       console.error('Error reserving stock:', error);
       return false;
@@ -170,34 +158,22 @@ class InventoryService {
   // Release reserved stock (e.g., when order is cancelled)
   async releaseReservedStock(items: { productId: string; variantId?: string; quantity: number }[], orderId: string): Promise<boolean> {
     try {
-      for (const item of items) {
-        const inventory = await this.getInventory(item.productId, item.variantId);
-        if (!inventory) continue;
+      // Use transaction to ensure atomicity
+      const { data, error } = await (supabase as any).rpc('release_reserved_stock_atomic', {
+        items_data: items.map(item => ({
+          product_id: item.productId,
+          variant_id: item.variantId || null,
+          quantity: item.quantity
+        })),
+        order_id: orderId
+      });
 
-        // Update reserved quantity
-        const newReservedQuantity = Math.max(0, inventory.reservedQuantity - item.quantity);
-        const { error: updateError } = await supabase
-          .from('inventory')
-          .update({
-            reserved_quantity: newReservedQuantity,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', inventory.id);
-
-        if (updateError) throw updateError;
-
-        // Record movement
-        await this.recordMovement({
-          inventory_id: inventory.id,
-          movement_type: 'released',
-          quantity: item.quantity,
-          reference_type: 'order',
-          reference_id: orderId,
-          reason: 'Stock released from cancelled order'
-        });
+      if (error) {
+        console.error('Error in atomic stock release:', error);
+        return false;
       }
 
-      return true;
+      return data === true;
     } catch (error) {
       console.error('Error releasing reserved stock:', error);
       return false;
@@ -207,37 +183,22 @@ class InventoryService {
   // Fulfill order (convert reserved stock to sold)
   async fulfillOrder(items: { productId: string; variantId?: string; quantity: number }[], orderId: string): Promise<boolean> {
     try {
-      for (const item of items) {
-        const inventory = await this.getInventory(item.productId, item.variantId);
-        if (!inventory) continue;
+      // Use transaction to ensure atomicity
+      const { data, error } = await (supabase as any).rpc('fulfill_order_atomic', {
+        items_data: items.map(item => ({
+          product_id: item.productId,
+          variant_id: item.variantId || null,
+          quantity: item.quantity
+        })),
+        order_id: orderId
+      });
 
-        // Update quantities
-        const newQuantity = inventory.quantity - item.quantity;
-        const newReservedQuantity = Math.max(0, inventory.reservedQuantity - item.quantity);
-        
-        const { error: updateError } = await supabase
-          .from('inventory')
-          .update({
-            quantity: newQuantity,
-            reserved_quantity: newReservedQuantity,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', inventory.id);
-
-        if (updateError) throw updateError;
-
-        // Record movement
-        await this.recordMovement({
-          inventory_id: inventory.id,
-          movement_type: 'out',
-          quantity: item.quantity,
-          reference_type: 'order',
-          reference_id: orderId,
-          reason: 'Stock sold - order fulfilled'
-        });
+      if (error) {
+        console.error('Error in atomic order fulfillment:', error);
+        return false;
       }
 
-      return true;
+      return data === true;
     } catch (error) {
       console.error('Error fulfilling order:', error);
       return false;
