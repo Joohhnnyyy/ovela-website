@@ -2,12 +2,13 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CreditCard, Lock, MapPin, User, Mail, Phone } from 'lucide-react';
+import { ArrowLeft, CreditCard, Lock, MapPin, User, Mail, Phone, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import { orderService } from '@/services/orderService';
 
 interface BillingInfo {
   firstName: string;
@@ -54,12 +55,40 @@ const CheckoutPage = () => {
     nameOnCard: ''
   });
 
+  const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
+
+  const countries = [
+    'United States',
+    'Canada',
+    'United Kingdom',
+    'Australia',
+    'Germany',
+    'France',
+    'India',
+    'Japan',
+    'Brazil'
+  ];
+
   // Redirect to login if not authenticated
   React.useEffect(() => {
     if (!currentUser) {
       router.push('/auth/login');
     }
   }, [currentUser, router]);
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isCountryDropdownOpen) {
+        setIsCountryDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isCountryDropdownOpen]);
 
   // Redirect to cart if empty
   React.useEffect(() => {
@@ -108,14 +137,78 @@ const CheckoutPage = () => {
     setIsProcessing(true);
 
     try {
+      console.log('Starting checkout process...');
+      console.log('Current user:', currentUser?.uid);
+      console.log('Cart items:', items);
+      
+      // Validate required fields
+      if (!billingInfo.firstName || !billingInfo.lastName || !billingInfo.address || 
+          !billingInfo.city || !billingInfo.state || !billingInfo.zipCode) {
+        throw new Error('Please fill in all required billing information');
+      }
+
+      if (!paymentInfo.cardNumber || !paymentInfo.expiryDate || !paymentInfo.cvv || !paymentInfo.nameOnCard) {
+        throw new Error('Please fill in all payment information');
+      }
+
+      if (!currentUser?.uid) {
+        throw new Error('User not authenticated');
+      }
+
+      if (!items || items.length === 0) {
+        throw new Error('Cart is empty');
+      }
+
+      // Validate cart items structure
+      for (const item of items) {
+        if (!item.productId || !item.product || !item.quantity) {
+          console.error('Invalid cart item:', item);
+          throw new Error('Invalid cart item detected');
+        }
+      }
+
+      console.log('Validation passed, simulating payment...');
       // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      console.log('Payment simulated, creating order...');
+      // Create order in database
+      const orderData = {
+        items: items,
+        shippingAddress: {
+          name: `${billingInfo.firstName} ${billingInfo.lastName}`,
+          firstName: billingInfo.firstName,
+          lastName: billingInfo.lastName,
+          address: billingInfo.address,
+          city: billingInfo.city,
+          state: billingInfo.state,
+          pincode: billingInfo.zipCode,
+          zipCode: billingInfo.zipCode,
+          country: billingInfo.country
+        },
+        paymentMethod: 'credit_card'
+      };
+
+      console.log('Order data prepared:', orderData);
+      const createdOrder = await orderService.createOrder(orderData, currentUser.uid);
+      console.log('Order created successfully:', createdOrder);
       
       // Clear cart after successful order
+      console.log('Clearing cart...');
       await clearCart();
+      console.log('Cart cleared, order complete!');
       setOrderComplete(true);
     } catch (error) {
-      console.error('Payment failed:', error);
+      console.error('Checkout failed:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        currentUser: currentUser?.uid,
+        itemsCount: items?.length || 0,
+        billingComplete: !!(billingInfo.firstName && billingInfo.lastName && billingInfo.address),
+        paymentComplete: !!(paymentInfo.cardNumber && paymentInfo.expiryDate)
+      });
+      alert(error instanceof Error ? error.message : 'Order creation failed. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -271,17 +364,38 @@ const CheckoutPage = () => {
                       className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-white focus:border-transparent"
                     />
                   </div>
-                  <div>
+                  <div className="relative">
                     <label className="block text-sm font-medium mb-2">Country</label>
-                    <select
-                      value={billingInfo.country}
-                      onChange={(e) => handleBillingChange('country', e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-white focus:border-transparent"
-                    >
-                      <option value="United States">United States</option>
-                      <option value="Canada">Canada</option>
-                      <option value="United Kingdom">United Kingdom</option>
-                    </select>
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
+                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-white focus:border-transparent text-left flex items-center justify-between hover:bg-gray-750 transition-colors"
+                      >
+                        <span>{billingInfo.country}</span>
+                        <ChevronDown className={`w-5 h-5 transition-transform ${isCountryDropdownOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                      
+                      {isCountryDropdownOpen && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                          {countries.map((country) => (
+                            <button
+                              key={country}
+                              type="button"
+                              onClick={() => {
+                                handleBillingChange('country', country);
+                                setIsCountryDropdownOpen(false);
+                              }}
+                              className={`w-full px-4 py-3 text-left hover:bg-gray-700 transition-colors ${
+                                billingInfo.country === country ? 'bg-gray-700 text-white' : 'text-gray-300'
+                              }`}
+                            >
+                              {country}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -388,11 +502,17 @@ const CheckoutPage = () => {
                 {items.map((item) => (
                   <div key={`${item.productId}-${item.size}-${item.color}`} className="flex items-center space-x-4">
                     <Image
-                      src={item.product.images[0]}
+                      src={item.product.images?.[0] || '/products/placeholder.svg'}
                       alt={item.product.name}
                       width={60}
                       height={60}
                       className="rounded-lg object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        if (target.src !== '/products/placeholder.svg') {
+                          target.src = '/products/placeholder.svg';
+                        }
+                      }}
                     />
                     <div className="flex-1">
                       <h3 className="font-semibold">{item.product.name}</h3>
@@ -418,9 +538,25 @@ const CheckoutPage = () => {
                   <span>Shipping</span>
                   <span>Free</span>
                 </div>
-                <div className="flex justify-between text-gray-400">
-                  <span>GST (18%)</span>
-                  <span>₹{tax.toLocaleString('en-IN')}</span>
+                <div className="bg-gray-800/20 rounded-lg p-3 space-y-2">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-400 font-medium">CGST (9%)</span>
+                    <span className="font-semibold text-gray-300">₹{Math.round(subtotal * 0.09).toLocaleString('en-IN')}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-400 font-medium">SGST (9%)</span>
+                    <span className="font-semibold text-gray-300">₹{Math.round(subtotal * 0.09).toLocaleString('en-IN')}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-400 font-medium">IGST (0%)</span>
+                    <span className="font-semibold text-gray-400">₹0</span>
+                  </div>
+                  <div className="border-t border-gray-700/50 pt-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-400 font-medium">Total GST (18%)</span>
+                      <span className="font-bold text-lg">₹{tax.toLocaleString('en-IN')}</span>
+                    </div>
+                  </div>
                 </div>
                 <div className="flex justify-between text-xl font-bold border-t border-gray-700 pt-3">
                   <span>Total</span>

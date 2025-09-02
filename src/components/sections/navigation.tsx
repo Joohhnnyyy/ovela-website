@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, ShoppingBag, X, ChevronDown, User, LogOut } from 'lucide-react';
+import { Menu, ShoppingBag, X, ChevronDown, User, LogOut, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
@@ -210,6 +210,15 @@ export default function Navigation() {
                       <User size={16} className="mr-1" />
                       {currentUser.displayName || currentUser.email}
                     </span>
+                    <motion.div
+                      whileHover={{ y: -2 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Link href="/orders" className={navLinkClasses}>
+                        <Package size={16} className="mr-1" />
+                        Orders
+                      </Link>
+                    </motion.div>
                     <motion.button
                       onClick={handleLogout}
                       className={navLinkClasses}

@@ -142,31 +142,46 @@ export class CartService {
         imageExtension = '.webp';
       }
 
-      // Create a simplified product object for offline mode
-      // Get actual product price from product data
-      const getProductPrice = (productId: string): number => {
-        const actualProduct = getProductById(productId);
-        if (actualProduct) {
-          return actualProduct.price;
-        }
-        
-        // Fallback to base prices in INR if product not found
-        const basePrices = {
-          sneakers: 8999,
-          bags: 4999,
-          clothing: 2999,
-          accessories: 1999
-        };
-        
-        return basePrices[category as keyof typeof basePrices] || 8999;
-      };
-
-      const simpleProduct: Product = {
+      // Get actual product data or create simplified version
+      const actualProduct = getProductById(productId);
+      
+      const simpleProduct: Product = actualProduct ? {
+        id: actualProduct.id,
+        name: actualProduct.name,
+        description: actualProduct.description,
+        price: actualProduct.price,
+        originalPrice: actualProduct.originalPrice,
+        category: actualProduct.category,
+        subcategory: undefined,
+        brand: 'Ovela',
+        images: actualProduct.images,
+        sizes: actualProduct.sizes.map(size => ({ size, label: size, available: true })),
+        colors: actualProduct.colors.map(color => ({ color: color.toLowerCase(), name: color, hexCode: color === 'Black' ? '#000000' : color === 'White' ? '#FFFFFF' : '#808080', available: true })),
+        inventory: [],
+        tags: [],
+        isActive: true,
+        isFeatured: actualProduct.featured || false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        rating: 4.5,
+        reviewCount: 0
+      } : {
         id: productId,
         name: productId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
         description: 'Premium product with modern design',
-        price: getProductPrice(productId),
+        price: (() => {
+          // Fallback pricing based on category
+          const basePrices = {
+            sneakers: 12999,
+            clothing: 15999,
+            bags: 18999,
+            accessories: 8999
+          };
+          return basePrices[category as keyof typeof basePrices] || 8999;
+        })(),
+        originalPrice: undefined,
         category,
+        subcategory: undefined,
         brand: 'Ovela',
         images: [`/products/${category}/${productId}-1${imageExtension}`],
         sizes: [
@@ -183,7 +198,9 @@ export class CartService {
         isActive: true,
         isFeatured: false,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        rating: 4.5,
+        reviewCount: 0
       };
 
       // Check if item already exists in cart

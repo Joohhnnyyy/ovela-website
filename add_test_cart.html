@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head><title>Add Test Cart Items</title></head>
+<body>
+<h1>Adding Test Cart Items</h1>
+<script>
+// Create a guest user ID
+const guestId = 'guest_test_' + Date.now();
+localStorage.setItem('guest_user_id', guestId);
+
+// Create test cart data
+const testCart = {
+  id: guestId,
+  userId: guestId,
+  items: [
+    {
+      id: 'item1',
+      productId: 'b80-lounge-black',
+      quantity: 1,
+      size: 'M',
+      color: 'Black',
+      price: 12999,
+      product: {
+        id: 'b80-lounge-black',
+        name: 'B80 Lounge Black',
+        description: 'Premium black lounge sneakers',
+        price: 12999,
+        images: ['/products/sneakers/b80-lounge-black-1.webp', '/products/sneakers/b80-lounge-black-2.webp']
+      }
+    },
+    {
+      id: 'item2',
+      productId: 'b30-countdown-black-mesh',
+      quantity: 1,
+      size: 'L',
+      color: 'Black',
+      price: 11999,
+      product: {
+        id: 'b30-countdown-black-mesh',
+        name: 'B30 Countdown Black Mesh',
+        description: 'Athletic black mesh sneakers',
+        price: 11999,
+        images: ['/products/sneakers/b30-countdown-black-mesh-1.webp', '/products/sneakers/b30-countdown-black-mesh-2.webp']
+      }
+    }
+  ],
+  totalPrice: 24998,
+  totalItems: 2,
+  createdAt: new Date(),
+  updatedAt: new Date()
+};
+
+// Store in localStorage
+localStorage.setItem(`cart_${guestId}`, JSON.stringify(testCart));
+
+console.log('Test cart added:', testCart);
+document.body.innerHTML += '<p>Test cart items added! <a href="http://localhost:3000/cart">Go to Cart</a></p>';
+</script>
+</body>
+</html>

@@ -102,29 +102,39 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [state, dispatch] = useReducer(cartReducer, initialState);
   const { currentUser } = useAuth();
 
+  // Get user ID (authenticated user or guest)
+  const getUserId = () => {
+    if (currentUser) {
+      return currentUser.uid;
+    }
+    // Create or get guest user ID
+    let guestId = localStorage.getItem('guest_user_id');
+    if (!guestId) {
+      guestId = 'guest_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('guest_user_id', guestId);
+    }
+    return guestId;
+  };
+
   // Load cart items when user changes
   useEffect(() => {
-    if (currentUser) {
-      refreshCart();
-    } else {
-      dispatch({ type: 'CLEAR_CART' });
-    }
+    refreshCart();
   }, [currentUser]);
 
   const refreshCart = async () => {
-    if (!currentUser) return;
+    const userId = getUserId();
     
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       
       // First update cart prices to ensure they match current product prices
       // Use a non-blocking approach to prevent navigation issues
-      CartService.updateCartPrices(currentUser.uid).catch(error => {
+      CartService.updateCartPrices(userId).catch(error => {
         console.warn('Price update failed, continuing with existing prices:', error);
       });
       
       // Get the cart (this will get updated prices if the update succeeded)
-      const response = await CartService.getUserCart(currentUser.uid);
+      const response = await CartService.getUserCart(userId);
       if (response.success && response.data) {
         dispatch({ type: 'SET_CART', payload: response.data.items });
       }
@@ -140,13 +150,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     size: string = 'M',
     color: string = 'Default'
   ) => {
-    if (!currentUser) {
-      throw new Error('User must be logged in to add items to cart');
-    }
+    const userId = getUserId();
 
     try {
       const response = await CartService.addToCart(
-        currentUser.uid,
+        userId,
         product.id,
         size,
         color,
@@ -163,11 +171,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateQuantity = async (productId: string, size: string, color: string, quantity: number) => {
-    if (!currentUser) return;
+    const userId = getUserId();
 
     try {
       const response = await CartService.updateCartItem(
-        currentUser.uid,
+        userId,
         productId,
         size,
         color,
@@ -184,11 +192,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const removeFromCart = async (productId: string, size: string, color: string) => {
-    if (!currentUser) return;
+    const userId = getUserId();
 
     try {
       const response = await CartService.removeFromCart(
-        currentUser.uid,
+        userId,
         productId,
         size,
         color
@@ -204,10 +212,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const clearCart = async () => {
-    if (!currentUser) return;
+    const userId = getUserId();
 
     try {
-      const response = await CartService.clearCart(currentUser.uid);
+      const response = await CartService.clearCart(userId);
       if (response.success) {
         dispatch({ type: 'CLEAR_CART' });
       }
