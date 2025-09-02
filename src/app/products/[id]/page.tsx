@@ -5,12 +5,15 @@ import Footer from '@/components/sections/footer';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { getProductById, getRelatedProducts, products } from '@/data/products';
 import { useCart } from '@/contexts/CartContext';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
 export default function ProductDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const productId = params.id as string;
   const product = getProductById(productId);
   const { addToCart } = useCart();
@@ -89,6 +92,47 @@ export default function ProductDetailPage() {
     }
   };
 
+  const handleBuyNow = async () => {
+    if (!product) return;
+    
+    // Validate that size and color are selected
+    if (!product.sizes[selectedSize] || !product.colors[selectedColor]) {
+      console.error('Please select both size and color before proceeding');
+      return;
+    }
+    
+    try {
+      const selectedColorName = product.colors[selectedColor] || product.colors[0] || 'Default';
+      const selectedSizeName = product.sizes[selectedSize] || product.sizes[0] || 'Default';
+      
+      // Convert product to database Product format
+      const dbProduct = {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        category: product.category,
+        brand: 'Ovela', // Default brand
+        images: product.images,
+        sizes: product.sizes.map(size => ({ size, label: size, available: true })),
+        colors: product.colors.map(color => ({ color: color.toLowerCase(), name: color, hexCode: '#000000', available: true })),
+        inventory: [],
+        tags: [],
+        isActive: true,
+        isFeatured: product.featured || false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      // Add to cart and redirect to checkout
+      await addToCart(dbProduct, quantity, selectedSizeName, selectedColorName);
+      router.push('/checkout');
+    } catch (error) {
+      console.error('Error with buy now:', error);
+    }
+  };
+
   if (!product) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -101,7 +145,22 @@ export default function ProductDetailPage() {
     <div ref={containerRef} className="min-h-screen bg-black">
       <Navigation />
       
-      <div className="pt-32 pb-10">
+      {/* Back Button */}
+      <div className="pt-32 pb-4">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8">
+          <motion.button
+            onClick={() => router.back()}
+            className="inline-flex items-center text-white/70 hover:text-white transition-colors group"
+            whileHover={{ x: -5 }}
+            transition={{ duration: 0.2 }}
+          >
+            <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+            <span className="font-medium">Back</span>
+          </motion.button>
+        </div>
+      </div>
+      
+      <div className="pb-10">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-16">
             
@@ -267,6 +326,7 @@ export default function ProductDetailPage() {
                      className="w-full bg-white text-black py-4 md:py-3 px-6 rounded-xl md:rounded font-medium hover:bg-gray-100 transition-colors text-base md:text-lg touch-manipulation"
                      whileHover={{ scale: 1.02 }}
                      whileTap={{ scale: 0.98 }}
+                     onClick={handleBuyNow}
                    >
                      Buy now
                    </motion.button>

@@ -5,49 +5,50 @@ import Footer from '@/components/sections/footer';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { useState, useEffect, useRef } from 'react';
 
 const jacketProducts = [
   {
     id: 5,
-    name: "Black Jacket Set",
-    price: "₹15,699",
-    image: "/LOOK_H_25_4_LOOK_070_E05.webp",
+    name: "Car Coat Black",
+    price: "₹28,800",
+    image: "/products/clothing/car-coat-black-1.jpg",
     category: "Jackets",
     label: "New"
   },
   {
     id: 6,
-    name: "Black Jacket Set",
-    price: "₹15,699",
-    image: "/LOOK_H_25_4_LOOK_070_E06.webp",
+    name: "Dior Couture Hooded Jacket",
+    price: "₹25,200",
+    image: "/products/clothing/dior-couture-hooded-jacket-black-1.jpg",
     category: "Jackets",
-    label: "Jacket"
+    label: "Hoodie"
   },
   {
     id: 8,
-    name: "Leather Jacket",
-    price: "₹29,099",
-    image: "/LOOK_H_25_4_LOOK_070_E05.webp",
+    name: "Dior Oblique Blouson",
+    price: "₹21,600",
+    image: "/products/clothing/dior-oblique-blouson-gray-1.jpg",
     category: "Jackets",
     label: "Premium"
   },
   {
     id: 11,
-    name: "Bomber Jacket",
-    price: "₹23,199",
-    image: "/LOOK_H_25_4_LOOK_070_E06.webp",
+    name: "Dior Oblique Denim Jacket",
+    price: "₹17,100",
+    image: "/products/clothing/dior-oblique-jacket-blue-denim-1.webp",
     category: "Jackets",
-    label: "Bomber"
+    label: "Denim"
   },
   {
     id: 14,
-    name: "Denim Jacket",
-    price: "₹13,199",
-    image: "/LOOK_H_25_4_LOOK_070_E05.webp",
+    name: "Zipped Shirt Jacket",
+    price: "₹13,950",
+    image: "/products/clothing/zipped-shirt-blue-dior-oblique-1.jpg",
     category: "Jackets",
-    label: "Denim"
+    label: "Shirt"
   }
 ];
 
@@ -144,6 +145,22 @@ export default function JacketsPage() {
       
       {/* Header Section */}
       <section className="relative z-10 pt-[115px] pb-8 px-4 lg:px-[70px]">
+        {/* Back Button */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-6"
+        >
+          <Link
+            href="/"
+            className="inline-flex items-center space-x-2 text-white/70 hover:text-white transition-colors group"
+          >
+            <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+            <span>Back to Home</span>
+          </Link>
+        </motion.div>
+        
         <div className="flex justify-between items-center mb-8">
           <motion.h1
             initial={{ opacity: 0, x: -30 }}

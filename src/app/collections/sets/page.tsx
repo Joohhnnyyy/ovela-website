@@ -5,33 +5,50 @@ import Footer from '@/components/sections/footer';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { useState, useEffect, useRef } from 'react';
 
 const setProducts = [
   {
     id: 9,
-    name: "Tracksuit Set",
+    name: "Tailored Track Pants Set",
     price: "₹24,899",
-    image: "/LOOK_H_25_4_LOOK_070_E01.webp",
+    image: "/products/clothing/tailored-track-pants-dior-1.jpg",
     category: "Sets",
-    label: "Set"
+    label: "Sport"
   },
   {
     id: 12,
-    name: "Casual Set",
+    name: "Cargo Pants Set",
     price: "₹20,699",
-    image: "/LOOK_H_25_4_LOOK_070_E02.webp",
+    image: "/products/clothing/cargo-pants-black-1.jpg",
     category: "Sets",
     label: "Casual"
   },
   {
     id: 15,
-    name: "Sport Set",
+    name: "Tailored Pants Set",
     price: "₹27,399",
-    image: "/LOOK_H_25_4_LOOK_070_E03.webp",
+    image: "/products/clothing/tailored-pants-gray-1.jpg",
     category: "Sets",
-    label: "Sport"
+    label: "Formal"
+  },
+  {
+    id: 16,
+    name: "Dior Montaigne Complete Set",
+    price: "₹32,100",
+    image: "/products/clothing/dior-montaigne-tshirt-white-regular-1.jpg",
+    category: "Sets",
+    label: "Premium"
+  },
+  {
+    id: 17,
+    name: "Car Coat Formal Set",
+    price: "₹45,600",
+    image: "/products/clothing/car-coat-black-1.jpg",
+    category: "Sets",
+    label: "Luxury"
   }
 ];
 
@@ -128,6 +145,22 @@ export default function SetsPage() {
       
       {/* Header Section */}
       <section className="relative z-10 pt-[115px] pb-8 px-4 lg:px-[70px]">
+        {/* Back Button */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-6"
+        >
+          <Link
+            href="/"
+            className="inline-flex items-center space-x-2 text-white/70 hover:text-white transition-colors group"
+          >
+            <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+            <span>Back to Home</span>
+          </Link>
+        </motion.div>
+        
         <div className="flex justify-between items-center mb-8">
           <motion.h1
             initial={{ opacity: 0, x: -30 }}

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, EyeOff, Mail, Lock, X, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, X, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
@@ -131,6 +131,21 @@ function LoginPageContent() {
       
       <div className="pt-20 pb-20 px-4 lg:px-[70px]">
         <div className="max-w-md mx-auto">
+          {/* Back Button */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mb-8"
+          >
+            <Link
+              href="/"
+              className="inline-flex items-center space-x-2 text-white/70 hover:text-white transition-colors group"
+            >
+              <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+              <span>Back to Home</span>
+            </Link>
+          </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

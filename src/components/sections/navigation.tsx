@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, ShoppingBag, X, ChevronDown, User, LogOut, Package } from 'lucide-react';
+import { Menu, ShoppingBag, X, User, LogOut, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
@@ -12,7 +12,7 @@ const navLinkClasses = "flex items-center text-white uppercase text-sm font-norm
 
 
 export default function Navigation() {
-  const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { currentUser, logout } = useAuth();
   const cart = useCart();
   const cartItems = cart?.items || [];
@@ -70,67 +70,65 @@ export default function Navigation() {
           initial="hidden"
           animate="visible"
         >
-          {/* Left Side: Mobile Menu Toggle & Desktop Navigation */}
+          {/* Mobile Top Controls Container */}
           <motion.div 
-            className="flex-1 flex justify-start"
+            className="lg:hidden fixed top-4 left-4 right-4 z-50 flex justify-between items-center"
             variants={itemVariants}
           >
             <motion.button 
               aria-label="open menu" 
-              className="p-2 -ml-2 text-white lg:hidden cursor-interactive"
+              className="p-2 text-white cursor-interactive touch-manipulation bg-black/20 backdrop-blur-sm rounded-lg"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               transition={{ duration: 0.2 }}
+              onClick={() => setIsMobileMenuOpen(true)}
+              style={{ touchAction: 'manipulation' }}
             >
               <Menu size={24} />
             </motion.button>
+            
+            <Link href="/cart" className="block">
+              <motion.div 
+                className="p-2 text-white cursor-interactive touch-manipulation bg-black/20 backdrop-blur-sm rounded-lg relative"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+                style={{ touchAction: 'manipulation' }}
+              >
+                <ShoppingBag size={24} />
+                {cartItems?.length > 0 && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-1 -right-1 bg-white text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium"
+                  >
+                    {cartItems?.length || 0}
+                  </motion.span>
+                )}
+              </motion.div>
+            </Link>
+          </motion.div>
+
+          {/* Left Side: Desktop Navigation */}
+          <motion.div 
+            className="flex-1 flex justify-start"
+            variants={itemVariants}
+          >
             <nav aria-label="menu principale" className="hidden lg:block">
               <ul role="menu" className="flex gap-x-8">
-                {/* Shop Dropdown */}
+                {/* Shop Link */}
                 <motion.li 
                   role="menuitem"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.4 }}
-                  className="relative"
-                  onMouseEnter={() => setIsShopDropdownOpen(true)}
-                  onMouseLeave={() => setIsShopDropdownOpen(false)}
                 >
                   <motion.div
                     whileHover={{ y: -2 }}
                     transition={{ duration: 0.2 }}
-                    className="flex items-center gap-1"
                   >
                     <Link href="/collections/all" className={navLinkClasses}>Shop</Link>
-                    <ChevronDown size={16} className="text-white" />
                   </motion.div>
-                  
-                  <AnimatePresence>
-                    {isShopDropdownOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-full left-0 mt-2 bg-black/90 backdrop-blur-lg border border-white/10 rounded-lg p-4 min-w-[200px]"
-                      >
-                        <div className="flex flex-col gap-3">
-                          <Link href="/collections/all" className="text-white text-sm uppercase tracking-wider hover:opacity-70 transition-opacity">
-                            All Products
-                          </Link>
-                          <Link href="/collections/hoodies" className="text-white text-sm uppercase tracking-wider hover:opacity-70 transition-opacity">
-                            Hoodies
-                          </Link>
-                          <Link href="/collections/jackets" className="text-white text-sm uppercase tracking-wider hover:opacity-70 transition-opacity">
-                            Jackets
-                          </Link>
-                          <Link href="/collections/sets" className="text-white text-sm uppercase tracking-wider hover:opacity-70 transition-opacity">
-                            Sets
-                          </Link>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </motion.li>
                 
                 {/* Other Navigation Items */}
@@ -180,27 +178,6 @@ export default function Navigation() {
             variants={itemVariants}
           >
             <div className="flex items-center gap-x-4">
-              {/* Mobile Cart */}
-              <Link href="/cart" className="lg:hidden">
-                <motion.button 
-                  aria-label={`Open cart with ${cartItems?.length || 0} items`}
-                  className={`${navLinkClasses} p-2 relative`}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <ShoppingBag size={24} />
-                  {cartItems?.length > 0 && (
-                    <motion.span
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 bg-white text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium"
-                    >
-                      {cartItems?.length || 0}
-                    </motion.span>
-                  )}
-                </motion.button>
-              </Link>
               
               {/* Desktop Auth Links */}
               <div className="hidden lg:flex items-center gap-x-6">
@@ -263,6 +240,180 @@ export default function Navigation() {
           </motion.div>
         </motion.header>
       </div>
+      
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-50 lg:hidden"
+          >
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            
+            {/* Menu Panel */}
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="relative h-full w-80 bg-black/95 backdrop-blur-lg border-r border-white/10"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between p-6 border-b border-white/10">
+                <span className="font-sans text-2xl font-normal tracking-[0.1em] text-white">
+                  OVELA
+                </span>
+                <motion.button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 text-white hover:opacity-70 transition-opacity"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <X size={24} />
+                </motion.button>
+              </div>
+              
+              {/* Navigation Links */}
+              <div className="p-6 space-y-6">
+                {/* Shop Section */}
+                <div className="space-y-4">
+                  <h3 className="text-white/60 uppercase text-xs tracking-wider font-medium">
+                    Shop
+                  </h3>
+                  <div className="space-y-3 pl-4">
+                    {[
+                      { href: '/collections/all', text: 'All Products' },
+                      { href: '/collections/hoodies', text: 'Hoodies' },
+                      { href: '/collections/jackets', text: 'Jackets' },
+                      { href: '/collections/sets', text: 'Sets' }
+                    ].map((link, index) => (
+                      <motion.div
+                        key={link.href}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 + index * 0.05 }}
+                      >
+                        <Link
+                          href={link.href}
+                          className="block text-white text-lg hover:opacity-70 transition-opacity"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {link.text}
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Other Pages */}
+                <div className="space-y-4">
+                  <h3 className="text-white/60 uppercase text-xs tracking-wider font-medium">
+                    Pages
+                  </h3>
+                  <div className="space-y-3 pl-4">
+                    {[
+                      { href: '/pages/about', text: 'About' },
+                      { href: '/pages/lookbook', text: 'Lookbook' }
+                    ].map((link, index) => (
+                      <motion.div
+                        key={link.href}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 + index * 0.05 }}
+                      >
+                        <Link
+                          href={link.href}
+                          className="block text-white text-lg hover:opacity-70 transition-opacity"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {link.text}
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Account Section */}
+                <div className="space-y-4">
+                  <h3 className="text-white/60 uppercase text-xs tracking-wider font-medium">
+                    Account
+                  </h3>
+                  <div className="space-y-3 pl-4">
+                    {currentUser ? (
+                      <>
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.4 }}
+                        >
+                          <span className="block text-white/70 text-sm">
+                            {currentUser.displayName || currentUser.email}
+                          </span>
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.45 }}
+                        >
+                          <Link
+                            href="/orders"
+                            className="flex items-center text-white text-lg hover:opacity-70 transition-opacity"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            <Package size={18} className="mr-2" />
+                            Orders
+                          </Link>
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.5 }}
+                        >
+                          <button
+                            onClick={() => {
+                              handleLogout();
+                              setIsMobileMenuOpen(false);
+                            }}
+                            className="flex items-center text-white text-lg hover:opacity-70 transition-opacity"
+                          >
+                            <LogOut size={18} className="mr-2" />
+                            Logout
+                          </button>
+                        </motion.div>
+                      </>
+                    ) : (
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4 }}
+                      >
+                        <Link
+                          href="/auth/login"
+                          className="flex items-center text-white text-lg hover:opacity-70 transition-opacity"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          <User size={18} className="mr-2" />
+                          Login
+                        </Link>
+                      </motion.div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

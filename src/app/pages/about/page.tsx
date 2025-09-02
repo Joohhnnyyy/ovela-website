@@ -5,6 +5,8 @@ import Navigation from '@/components/sections/navigation';
 import Footer from '@/components/sections/footer';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
 export default function AboutPage() {
   const containerRef = useRef(null);
@@ -38,6 +40,22 @@ export default function AboutPage() {
   return (
     <div ref={containerRef} className="min-h-screen bg-black">
       <Navigation />
+      
+      {/* Back Button */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5 }}
+        className="fixed top-[130px] left-4 lg:left-[70px] z-40"
+      >
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-300 group"
+        >
+          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-300" />
+          <span className="text-sm font-medium">Back to Home</span>
+        </Link>
+      </motion.div>
       
       {/* Hero Section */}
       <section className="pt-[115px] pb-20 px-4 lg:px-[70px]">

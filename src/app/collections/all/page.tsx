@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import Navigation from '@/components/sections/navigation';
 import Footer from '@/components/sections/footer';
 import { products, getProductsByCategory } from '@/data/products';
@@ -90,6 +91,23 @@ export default function ShopPage() {
           <p className="text-xl md:text-2xl font-light tracking-wide opacity-80">
             Discover Our Latest Pieces
           </p>
+        </motion.div>
+      </section>
+
+      {/* Back Button */}
+      <section className="pt-8 px-4 lg:px-[70px]">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Link
+            href="/"
+            className="inline-flex items-center space-x-2 text-white/70 hover:text-white transition-colors group"
+          >
+            <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+            <span>Back to Home</span>
+          </Link>
         </motion.div>
       </section>
 

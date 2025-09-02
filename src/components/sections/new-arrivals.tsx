@@ -28,72 +28,102 @@ type Product = {
 const productsData: Product[] = [
   {
     id: 1,
-    name: 'Fragment',
-    type: 'Hoodie',
-    price: '₹14,400',
+    name: 'CD Icon T-Shirt Fitted',
+    type: 'T-shirt',
+    price: '₹58,500',
     isNew: true,
-    productUrl: '/en/products/fragment',
-    sizes: ['S', 'M', 'L', 'XL'],
+    productUrl: '/products/cd-icon-tshirt-white-fitted',
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
     variants: [
       {
-        colorHex: '#141414',
+        colorHex: '#ffffff',
         images: [
-          'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/Fragment-W-Front-2.webp?',
-          'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/Fragment-W-Back-3.webp?',
-          'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/Fragment-M-Back-4.webp?',
-          'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/Fragment-Focus-5.webp?',
+          '/products/clothing/cd-icon-tshirt-white-fitted-1.webp',
         ],
       },
     ],
   },
   {
     id: 2,
-    name: 'Amnesia',
-    type: 'Bucket hat',
-    price: '₹3,600',
+    name: 'Christian Dior Couture T-Shirt',
+    type: 'T-shirt',
+    price: '₹67,500',
     isNew: true,
-    productUrl: '/en/products/amnesia-bleu',
-    sizes: ['TU'],
+    productUrl: '/products/dior-couture-tshirt-white-relaxed',
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
     variants: [
       {
-        colorHex: '#141414',
+        colorHex: '#ffffff',
         images: [
-          'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/Amnesia-Focus2-11.webp?',
-        ],
-      },
-      {
-        colorHex: '#072f83',
-        images: [
-          'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/AmnesiaB-W-Front-8.webp?',
-          'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/AmnesiaB-W-Side-9.webp?',
-          'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/AmnesiaB-Focus-10.webp?',
+          '/products/clothing/dior-couture-tshirt-white-relaxed-1.webp',
         ],
       },
     ],
   },
   {
     id: 3,
-    name: 'Quiet remorse',
+    name: 'Dior Montaigne T-Shirt',
     type: 'T-shirt',
-    price: '₹5,760',
+    price: '₹53,100',
     isNew: true,
-    productUrl: '/en/products/quiet-remorse-noir',
-    sizes: ['S', 'M', 'L', 'XL'],
+    productUrl: '/products/dior-montaigne-tshirt-white-regular',
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    variants: [
+      {
+        colorHex: '#ffffff',
+        images: [
+          '/products/clothing/dior-montaigne-tshirt-white-regular-1.jpg',
+        ],
+      },
+    ],
+  },
+  {
+    id: 4,
+    name: 'CD Icon Sweatshirt',
+    type: 'Hoodie',
+    price: '₹1,200',
+    isNew: true,
+    productUrl: '/products/cd-icon-sweatshirt-black',
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
     variants: [
       {
         colorHex: '#141414',
         images: [
-            'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/Remorse-M-Front-13.webp?',
-            'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/Remorse-W-Back2-15.webp?',
-            'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/Remose-Focus-16.webp?',
+          '/products/clothing/cd-icon-sweatshirt-black-1.webp',
         ],
       },
+    ],
+  },
+  {
+    id: 5,
+    name: 'Dior Montaigne Sweatshirt',
+    type: 'Hoodie',
+    price: '₹99,000',
+    isNew: true,
+    productUrl: '/products/dior-montaigne-sweatshirt-black',
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    variants: [
       {
-        colorHex: '#072f83',
-        images: [ // Reusing black images as no blue ones are provided
-            'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/Remorse-M-Front-13.webp?',
-            'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/Remorse-W-Back2-15.webp?',
-            'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/c15368c0-3e82-4fbc-b713-6f8edd52e140-oflyn-fr/assets/images/Remose-Focus-16.webp?',
+        colorHex: '#141414',
+        images: [
+          '/products/clothing/dior-montaigne-sweatshirt-black-1.jpg',
+        ],
+      },
+    ],
+  },
+  {
+    id: 6,
+    name: 'Christian Dior Couture Hooded Jacket',
+    type: 'Hoodie',
+    price: '₹252,000',
+    isNew: true,
+    productUrl: '/products/dior-couture-hooded-jacket-black',
+    sizes: ['46', '48', '50', '52', '54'],
+    variants: [
+      {
+        colorHex: '#141414',
+        images: [
+          '/products/clothing/dior-couture-hooded-jacket-black-1.jpg',
         ],
       },
     ],

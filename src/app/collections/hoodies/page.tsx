@@ -1,69 +1,72 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowLeft, Menu, ShoppingBag, X, User, LogOut, Package } from 'lucide-react';
 import Navigation from '@/components/sections/navigation';
 import Footer from '@/components/sections/footer';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const hoodieProducts = [
   {
     id: 1,
-    name: "Black Hoodie Set",
-    price: "₹15,699",
-    image: "/LOOK_H_25_4_LOOK_070_E01.webp",
+    name: "CD Icon Sweatshirt Black",
+    price: "₹18,900",
+    image: "/products/clothing/cd-icon-sweatshirt-black-1.webp",
     category: "Hoodies",
     label: "New"
   },
   {
     id: 2,
-    name: "Black Hoodie Set",
-    price: "₹15,699",
-    image: "/LOOK_H_25_4_LOOK_070_E02.webp",
+    name: "Dior Montaigne Sweatshirt",
+    price: "₹19,800",
+    image: "/products/clothing/dior-montaigne-sweatshirt-black-1.jpg",
     category: "Hoodies",
-    label: "Hoodie"
+    label: "Premium"
   },
   {
     id: 3,
-    name: "Black Hoodie Set",
-    price: "₹15,699",
-    image: "/LOOK_H_25_4_LOOK_070_E03.webp",
+    name: "CD Icon Zipped Sweater",
+    price: "₹14,850",
+    image: "/products/clothing/cd-icon-sweater-gray-zipped-1.webp",
     category: "Hoodies",
-    label: "Hoodie"
+    label: "Zip"
   },
   {
     id: 4,
-    name: "Black Hoodie Set",
-    price: "₹15,699",
-    image: "/LOOK_H_25_4_LOOK_070_E04.webp",
+    name: "Dior Couture Hooded Jacket",
+    price: "₹25,200",
+    image: "/products/clothing/dior-couture-hooded-jacket-black-1.jpg",
     category: "Hoodies",
     label: "Hoodie"
   },
   {
     id: 7,
-    name: "Premium Hoodie",
-    price: "₹19,099",
-    image: "/LOOK_H_25_4_LOOK_070_E01.webp",
+    name: "CD Icon T-Shirt Fitted",
+    price: "₹5,850",
+    image: "/products/clothing/cd-icon-tshirt-white-fitted-1.webp",
     category: "Hoodies",
-    label: "Premium"
+    label: "Casual"
   },
   {
     id: 10,
-    name: "Oversized Hoodie",
-    price: "₹17,399",
-    image: "/LOOK_H_25_4_LOOK_070_E02.webp",
+    name: "Dior Oblique T-Shirt Relaxed",
+    price: "₹6,480",
+    image: "/products/clothing/dior-oblique-tshirt-offwhite-relaxed-1.webp",
     category: "Hoodies",
-    label: "Oversized"
+    label: "Relaxed"
   },
   {
     id: 13,
-    name: "Zip Hoodie",
-    price: "₹16,599",
-    image: "/LOOK_H_25_4_LOOK_070_E03.webp",
+    name: "Dior Couture T-Shirt",
+    price: "₹6,750",
+    image: "/products/clothing/dior-couture-tshirt-white-relaxed-1.webp",
     category: "Hoodies",
-    label: "Zip"
+    label: "Classic"
   }
 ];
 
@@ -73,7 +76,41 @@ export default function HoodiesPage() {
   const ovelaRef = useRef<HTMLDivElement>(null);
   const [sortBy, setSortBy] = useState("alphabetically");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const itemsPerPage = 6;
+  const { addToCart } = useCart();
+  const { currentUser, logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  const handleAddToCart = (e: React.MouseEvent, product: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const productData = {
+      id: product.id,
+      name: product.name,
+      description: '',
+      price: parseInt(product.price.replace('₹', '').replace(',', '')),
+      category: product.category,
+      brand: 'OVELA',
+      images: [product.image],
+      sizes: [{ size: 'M', label: 'Medium', available: true }],
+      colors: [{ color: 'black', name: 'Black', hexCode: '#000000', available: true }],
+      inventory: [{ size: 'M', color: 'black', quantity: 10, sku: `${product.id}-M-black` }],
+      tags: [product.label],
+      isActive: true,
+      isFeatured: false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    addToCart(productData, 1, 'M', 'black');
+  };
 
   // Scroll setup for OVELA section
   const containerRef = useRef(null);
@@ -182,6 +219,54 @@ export default function HoodiesPage() {
       
       {/* Header Section */}
       <section className="relative z-10 pt-[115px] pb-8 px-4 lg:px-[70px]">
+        {/* Mobile Top Controls Container */}
+        <motion.div 
+          className="lg:hidden fixed top-4 left-4 right-4 z-[100] flex justify-between items-center pointer-events-auto"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <motion.button 
+             aria-label="open menu" 
+             className="p-3 text-white cursor-interactive touch-manipulation bg-black/30 backdrop-blur-md rounded-lg shadow-lg"
+             whileHover={{ scale: 1.1 }}
+             whileTap={{ scale: 0.9 }}
+             transition={{ duration: 0.2 }}
+             onClick={() => setIsMobileMenuOpen(true)}
+             style={{ touchAction: 'manipulation' }}
+           >
+             <Menu size={24} />
+           </motion.button>
+          
+          <Link href="/cart" className="block">
+            <motion.div 
+              className="p-3 text-white cursor-interactive touch-manipulation bg-black/30 backdrop-blur-md rounded-lg shadow-lg relative"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ duration: 0.2 }}
+              style={{ touchAction: 'manipulation' }}
+            >
+              <ShoppingBag size={24} />
+            </motion.div>
+          </Link>
+        </motion.div>
+        
+        {/* Back Button */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-6"
+        >
+          <Link
+            href="/"
+            className="inline-flex items-center space-x-2 text-white/70 hover:text-white transition-colors group"
+          >
+            <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+            <span>Back to Home</span>
+          </Link>
+        </motion.div>
+        
         <div className="flex justify-between items-center mb-8">
           <motion.h1
             initial={{ opacity: 0, x: -30 }}
@@ -277,7 +362,10 @@ export default function HoodiesPage() {
                       <div className="flex-1"></div>
                       <div className="flex flex-col justify-end h-full">
                         <div className="transform translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                          <button className="w-full bg-white text-black py-4 uppercase tracking-wider text-sm font-medium hover:bg-gray-100 transition-colors">
+                          <button 
+                            onClick={(e) => handleAddToCart(e, product)}
+                            className="w-full bg-white text-black py-4 uppercase tracking-wider text-sm font-medium hover:bg-gray-100 transition-colors"
+                          >
                             QUICK ADD TO BAG
                           </button>
                         </div>
@@ -363,6 +451,180 @@ export default function HoodiesPage() {
           ))}
         </motion.h1>
       </motion.div>
+      
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-50 lg:hidden"
+          >
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            
+            {/* Menu Panel */}
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="relative h-full w-80 bg-black/95 backdrop-blur-lg border-r border-white/10"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between p-6 border-b border-white/10">
+                <span className="font-sans text-2xl font-normal tracking-[0.1em] text-white">
+                  OVELA
+                </span>
+                <motion.button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 text-white hover:opacity-70 transition-opacity"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <X size={24} />
+                </motion.button>
+              </div>
+              
+              {/* Navigation Links */}
+              <div className="p-6 space-y-6">
+                {/* Shop Section */}
+                <div className="space-y-4">
+                  <h3 className="text-white/60 uppercase text-xs tracking-wider font-medium">
+                    Shop
+                  </h3>
+                  <div className="space-y-3 pl-4">
+                    {[
+                      { href: '/collections/all', text: 'All Products' },
+                      { href: '/collections/hoodies', text: 'Hoodies' },
+                      { href: '/collections/jackets', text: 'Jackets' },
+                      { href: '/collections/sets', text: 'Sets' }
+                    ].map((link, index) => (
+                      <motion.div
+                        key={link.href}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 + index * 0.05 }}
+                      >
+                        <Link
+                          href={link.href}
+                          className="block text-white text-lg hover:opacity-70 transition-opacity"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {link.text}
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Other Pages */}
+                <div className="space-y-4">
+                  <h3 className="text-white/60 uppercase text-xs tracking-wider font-medium">
+                    Pages
+                  </h3>
+                  <div className="space-y-3 pl-4">
+                    {[
+                      { href: '/pages/about', text: 'About' },
+                      { href: '/pages/lookbook', text: 'Lookbook' }
+                    ].map((link, index) => (
+                      <motion.div
+                        key={link.href}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 + index * 0.05 }}
+                      >
+                        <Link
+                          href={link.href}
+                          className="block text-white text-lg hover:opacity-70 transition-opacity"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {link.text}
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Account Section */}
+                <div className="space-y-4">
+                  <h3 className="text-white/60 uppercase text-xs tracking-wider font-medium">
+                    Account
+                  </h3>
+                  <div className="space-y-3 pl-4">
+                    {currentUser ? (
+                      <>
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.4 }}
+                        >
+                          <span className="block text-white/70 text-sm">
+                            {currentUser.displayName || currentUser.email}
+                          </span>
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.45 }}
+                        >
+                          <Link
+                            href="/orders"
+                            className="flex items-center text-white text-lg hover:opacity-70 transition-opacity"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            <Package size={18} className="mr-2" />
+                            Orders
+                          </Link>
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.5 }}
+                        >
+                          <button
+                            onClick={() => {
+                              handleLogout();
+                              setIsMobileMenuOpen(false);
+                            }}
+                            className="flex items-center text-white text-lg hover:opacity-70 transition-opacity"
+                          >
+                            <LogOut size={18} className="mr-2" />
+                            Logout
+                          </button>
+                        </motion.div>
+                      </>
+                    ) : (
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4 }}
+                      >
+                        <Link
+                          href="/auth/login"
+                          className="flex items-center text-white text-lg hover:opacity-70 transition-opacity"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          <User size={18} className="mr-2" />
+                          Login
+                        </Link>
+                      </motion.div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
