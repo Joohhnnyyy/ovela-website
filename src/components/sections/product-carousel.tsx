@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from "@/lib/utils";
-import { motion, Variants } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 interface Product {

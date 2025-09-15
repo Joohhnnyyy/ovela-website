@@ -218,14 +218,14 @@ export default function AboutPage() {
       </section>
 
       {/* Footer with faster scroll */}
-      <motion.div style={{ y: footerY }}>
+      <motion.div style={{ y: footerY }} className="relative z-20">
         <Footer />
       </motion.div>
       
       {/* OVELA Section with slower scroll and reveal effect */}
       <motion.div 
         ref={ovelaRef}
-        className="w-full h-[60vh] lg:h-[70vh] xl:h-[80vh] flex items-center justify-center bg-black text-white relative z-10"
+        className="w-full h-[60vh] lg:h-[70vh] xl:h-[80vh] flex items-center justify-center bg-black text-white relative z-10 mt-8"
         style={{ y: ovelaY }}
       >
         <motion.h1

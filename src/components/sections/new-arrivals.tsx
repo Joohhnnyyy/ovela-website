@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ArrowRight } from 'lucide-react';
-import { motion, Variants } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 type ProductVariant = {
@@ -323,7 +323,7 @@ export default function NewArrivals() {
         >
           <h2 className="text-xl uppercase text-white">New arrivals</h2>
           <div className="hidden lg:flex">
-            <Link href="/en/collections/all" passHref>
+            <Link href="/collections/all" passHref>
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}

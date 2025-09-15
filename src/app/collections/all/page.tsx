@@ -6,11 +6,11 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import Navigation from '@/components/sections/navigation';
 import Footer from '@/components/sections/footer';
-import { products, getProductsByCategory } from '@/data/products';
+import { products, getProductsByCategory, getProductsByGender } from '@/data/products';
 
 
 
-const categories = ["ALL PRODUCTS", "SNEAKERS", "CLOTHING", "ACCESSORIES", "BAGS"];
+const categories = ["ALL PRODUCTS", "HIM", "HER", "SNEAKERS", "CLOTHING", "ACCESSORIES", "BAGS"];
 
 export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState("ALL PRODUCTS");
@@ -29,6 +29,8 @@ export default function ShopPage() {
 
   const filteredProducts = selectedCategory === "ALL PRODUCTS" 
     ? products 
+    : selectedCategory === "HIM" || selectedCategory === "HER"
+    ? getProductsByGender(selectedCategory.toLowerCase() as 'him' | 'her')
     : getProductsByCategory(getCategoryKey(selectedCategory));
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);

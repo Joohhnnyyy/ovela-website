@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/firebase';
-import { User } from 'firebase/auth';
+import { auth } from './firebase';
+import { type User } from 'firebase/auth';
 import { supabase } from '@/lib/supabase';
 import crypto from 'crypto';
 

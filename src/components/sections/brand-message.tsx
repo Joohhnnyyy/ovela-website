@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { motion, Variants } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 const FranceIcon = ({ className }: { className?: string }) => (

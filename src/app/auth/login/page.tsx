@@ -71,6 +71,24 @@ function LoginPageContent() {
     
     setIsLoading(true);
     
+    // Check for admin credentials
+    const ADMIN_EMAIL = 'johnsonansh32@gmail.com';
+    const ADMIN_PASSWORD = '+12345qwert+';
+    
+    if (formData.email === ADMIN_EMAIL && formData.password === ADMIN_PASSWORD) {
+      // Admin login - set admin session and redirect to admin dashboard
+      localStorage.setItem('admin_authenticated', 'true');
+      localStorage.setItem('admin_session', Date.now().toString());
+      
+      // Set admin session in cookies for server-side authentication
+      document.cookie = `admin_authenticated=true; path=/; max-age=${24 * 60 * 60}`; // 24 hours
+      document.cookie = `admin_session=${Date.now()}; path=/; max-age=${24 * 60 * 60}`; // 24 hours
+      
+      setIsLoading(false);
+      router.push('/admin/dashboard');
+      return;
+    }
+    
     try {
       await login(formData.email, formData.password);
       router.push('/'); // Redirect to home page after successful login

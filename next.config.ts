@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  output: 'standalone',
   outputFileTracingRoot: path.resolve(__dirname, '../../'),
   turbopack: {
     rules: {

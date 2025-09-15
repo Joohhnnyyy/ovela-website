@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from 'react';
-import { useInView, Variants } from 'framer-motion';
+import { useAnimation, useInView, type Variants } from 'framer-motion';
 
 export const useScrollAnimation = (options?: {
   once?: boolean;
